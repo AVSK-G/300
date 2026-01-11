@@ -1,0 +1,1148 @@
+<!DOCTYPE html>  
+<html lang="hi">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>300</title>  
+
+<link rel="manifest" href="manifest.json">  
+<meta name="theme-color" content="#4CAF50">    <!-- Mobile / iOS support -->    
+<meta name="apple-mobile-web-app-capable" content="yes">  
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  
+<link rel="apple-touch-icon" href="assets/icon-192.png">  
+<style>  
+html,body{margin:0;height:100%;overflow:hidden;font-family:sans-serif}  
+body{display:flex;flex-direction:column;background:#fff}  
+  
+/* ===== TOP BAR ===== */  
+#top{  
+  background:#4CAF50;color:#fff;  
+  padding:6px 10px;  
+  display:flex;align-items:center;gap:8px  
+}  
+#nameBtn,#helpBtn{  
+  background:#fff;color:#4CAF50;  
+  border:none;border-radius:6px;  
+  padding:4px 10px;font-weight:bold  
+}  
+#planInfo{  
+  flex:1;  
+  text-align:center;  
+  font-size:13px;  
+}  
+  
+/* ===== MODES ===== */  
+#modes{display:flex;background:#388E3C}  
+#modes button{  
+  flex:1;border:none;background:none;color:#fff;  
+  padding:10px 0;font-size:14px  
+}  
+  
+/* ===== STAGE ===== */  
+#stage{flex:1;position:relative}  
+canvas{  
+  position:absolute;left:0;top:0;  
+  width:100%;height:100%;  
+  touch-action:none;  
+}  
+  
+/* ===== LICENSE OVERLAY ===== */  
+#license{  
+  position:fixed;  
+  inset:0;  
+  background:#fff;  
+  z-index:999;  
+  display:none;  
+  overflow:auto;  
+  padding:20px;  
+}  
+#license h2{text-align:center}  
+#card{  
+  max-width:360px;  
+  margin:10px auto;  
+  background:#673AB7;  
+  color:#fff;  
+  border-radius:14px;  
+  padding:20px;  
+  text-align:center  
+}  
+#contact{  
+  max-width:360px;  
+  margin:20px auto;  
+  background:#e8f5e9;  
+  padding:15px;  
+  border-radius:12px;  
+  text-align:center  
+}  
+#contact button{  
+  border:none;border-radius:8px;  
+  padding:10px 14px;  
+  margin:6px;  
+  font-size:14px;  
+  color:#fff  
+}  
+.call{background:#2196F3}  
+.wa{background:#4CAF50}  
+#license input{  
+  padding:10px;  
+  font-size:16px;  
+  width:90%;  
+  max-width:320px;  
+}  
+/* ===== TOOL BUTTON FINAL CSS ===== */  
+.tool{  
+  position:absolute;  
+  z-index:20;  
+  font-size:40px;  
+  border:none;  
+  border-radius:50%;  
+  padding:8px;  
+  background:#fafafa;  
+  cursor:move;  
+  touch-action:none;  
+}  
+.clear{  
+  background:#ff5252;  
+  color:#fff;  
+}  
+/* ===== PAGE NAV BUTTONS ===== */  
+.tool.nav{  
+  background:#263238;  
+  color:#fff;  
+  font-size:36px;  
+  border:3px solid #FFD600;  
+  box-shadow:0 4px 10px rgba(0,0,0,.3);  
+}  
+  
+/* LEFT PAGE BUTTON */  
+.tool.prev{  
+  left:0;  
+}  
+  
+/* RIGHT PAGE BUTTON */  
+.tool.next{  
+  right:0;  
+}  
+</style>  </head>  <body>  <!-- ===== TOP ===== -->  <div id="top">  
+  <button id="nameBtn">Name</button>  
+  <div id="planInfo">Free Trial</div>  
+  <a id="helpBtn" target="_blank">🆘 Help</a>  
+</div>  <!-- ===== MODES ===== -->  <div id="modes">  
+  <button onclick="setMode('vyanjan')">व्यंजन</button>  
+  <button onclick="setMode('swar')">स्वर</button>  
+  <button onclick="setMode('matra')">मात्राएँ</button>  
+  <button onclick="setMode('count')">गिनती</button>  
+  <button onclick="setMode('abc')">ABC</button>  
+  <button onclick="setMode('art')">आर्ट</button>  
+</div>  <!-- ===== GAME STAGE ===== -->  <div id="stage">  
+  <canvas id="base"></canvas>  
+  <canvas id="draw"></canvas>  <button class="tool" data-tool="pen" onclick="cycleSize()">✏️</button>
+<button class="tool" data-tool="pattern" onclick="cyclePattern()">🎭</button>
+<button class="tool" data-tool="color" onclick="cycleColor()">🎨</button>
+<button class="tool clear" data-tool="clear" onclick="clearPage()">🧹</button>
+<button class="tool" data-tool="eraser" onclick="eraser()">🧽</button>
+<button class="tool nav prev" data-tool="prev" onclick="prevPage()">⬅️</button>
+<button class="tool nav next" data-tool="next" onclick="nextPage()">➡️</button>
+
+<!-- ===== LICENSE SCREEN (OVERLAY) ===== -->  <div id="license">  
+  <h2>Trial समाप्त हो गया</h2>    <p style="text-align:center">  
+    <b>Activation ID:</b><br>  
+    <span id="actId"></span>  
+  </p>    <div id="card">  
+    <h2>Premium Plan</h2>  
+    <h1>₹249 / 1 Year</h1>  
+    <p>  
+      ✔ सभी गेम अनलॉक<br>  
+      ✔ विज्ञापन नहीं<br>  
+      ✔ बच्चों के लिए सुरक्षित  
+    </p>  
+  </div>    <div id="contact">  
+    <p><b>Activation Code के लिए संपर्क करें</b></p>  
+    <button class="call" onclick="callNow()">📞 Call करें</button>  
+    <button class="wa" onclick="waNow()">💬 WhatsApp करें</button>  
+  </div>    <div style="text-align:center">  
+    <input id="code" placeholder="Activation Code"><br><br>  
+    <button onclick="activate()">Activate</button>  
+  </div>  
+</div>  <script>  
+/* ================= DATA ================= */  
+ const DATA={  
+  vyanjan: [  
+  { ch:"क", voice:"क" }, { ch:"ख", voice:"ख" }, { ch:"ग", voice:"ग" }, { ch:"घ", voice:"घ" }, { ch:"ङ", voice:"ङ" },  
+  { ch:"च", voice:"च" }, { ch:"छ", voice:"छ" }, { ch:"ज", voice:"ज" }, { ch:"झ", voice:"झ" }, { ch:"ञ", voice:"ञ" },  
+  { ch:"ट", voice:"ट" }, { ch:"ठ", voice:"ठ" }, { ch:"ड", voice:"ड" }, { ch:"ढ", voice:"ढ" }, { ch:"ण", voice:"ण" },  
+  { ch:"त", voice:"त" }, { ch:"थ", voice:"थ" }, { ch:"द", voice:"द" }, { ch:"ध", voice:"ध" }, { ch:"न", voice:"न" },  
+  { ch:"प", voice:"प" }, { ch:"फ", voice:"फ" }, { ch:"ब", voice:"ब" }, { ch:"भ", voice:"भ" }, { ch:"म", voice:"म" },  
+  { ch:"य", voice:"य" }, { ch:"र", voice:"र" }, { ch:"ल", voice:"ल" }, { ch:"व", voice:"व" },  
+  { ch:"श", voice:"श" }, { ch:"ष", voice:"ष" }, { ch:"स", voice:"स" }, { ch:"ह", voice:"ह" },  
+  { ch:"क्ष", voice:"क्ष" }, { ch:"त्र", voice:"त्र" }, { ch:"ज्ञ", voice:"ज्ञ" }  
+],  
+  
+  swar: [  
+  { ch:"अ", voice:"अ" }, { ch:"आ", voice:"आ" }, { ch:"इ", voice:"इ" }, { ch:"ई", voice:"ई" },  
+  { ch:"उ", voice:"उ" }, { ch:"ऊ", voice:"ऊ" }, { ch:"ऋ", voice:"ऋ" },  
+  { ch:"ए", voice:"ए" }, { ch:"ऐ", voice:"ऐ" },  
+  { ch:"ओ", voice:"ओ" }, { ch:"औ", voice:"औ" },  
+  { ch:"अं", voice:"अं" }, { ch:"अः", voice:"अः" }  
+],  
+  
+  matra: [  
+  { ch:"ा", voice:"आ" }, { ch:"ि", voice:"इ" }, { ch:"ी", voice:"ई" },  
+  { ch:"ु", voice:"उ" }, { ch:"ू", voice:"ऊ" }, { ch:"ृ", voice:"ऋ" },  
+  { ch:"े", voice:"ए" }, { ch:"ै", voice:"ऐ" },  
+  { ch:"ो", voice:"ओ" }, { ch:"ौ", voice:"औ" },  
+  { ch:"ं", voice:"अं" }, { ch:"ः", voice:"अः" }  
+],  
+  
+  count: [  
+  { ch:"1", voice:"वन" }, { ch:"2", voice:"टू" }, { ch:"3", voice:"थ्री" }, { ch:"4", voice:"फोर" }, { ch:"5", voice:"फाइव" },  
+  { ch:"6", voice:"सिक्स" }, { ch:"7", voice:"सेवन" }, { ch:"8", voice:"एट" }, { ch:"9", voice:"नाइन" }, { ch:"10", voice:"टेन" },  
+  
+  { ch:"11", voice:"इलेवन" }, { ch:"12", voice:"ट्वेल्व" }, { ch:"13", voice:"थर्टीन" }, { ch:"14", voice:"फॉर्टीन" }, { ch:"15", voice:"फिफ़्टीन" },  
+  { ch:"16", voice:"सिक्स्टीन" }, { ch:"17", voice:"सेवेंटीन" }, { ch:"18", voice:"एटीन" }, { ch:"19", voice:"नाइन्टीन" }, { ch:"20", voice:"ट्वेंटी" },  
+  
+  { ch:"21", voice:"ट्वेंटी वन" }, { ch:"22", voice:"ट्वेंटी टू" }, { ch:"23", voice:"ट्वेंटी थ्री" }, { ch:"24", voice:"ट्वेंटी फोर" }, { ch:"25", voice:"ट्वेंटी फाइव" },  
+  { ch:"26", voice:"ट्वेंटी सिक्स" }, { ch:"27", voice:"ट्वेंटी सेवन" }, { ch:"28", voice:"ट्वेंटी एट" }, { ch:"29", voice:"ट्वेंटी नाइन" }, { ch:"30", voice:"थर्टी" },  
+  
+  { ch:"31", voice:"थर्टी वन" }, { ch:"32", voice:"थर्टी टू" }, { ch:"33", voice:"थर्टी थ्री" }, { ch:"34", voice:"थर्टी फोर" }, { ch:"35", voice:"थर्टी फाइव" },  
+  { ch:"36", voice:"थर्टी सिक्स" }, { ch:"37", voice:"थर्टी सेवन" }, { ch:"38", voice:"थर्टी एट" }, { ch:"39", voice:"थर्टी नाइन" }, { ch:"40", voice:"फॉर्टी" },  
+  
+  { ch:"41", voice:"फॉर्टी वन" }, { ch:"42", voice:"फॉर्टी टू" }, { ch:"43", voice:"फॉर्टी थ्री" }, { ch:"44", voice:"फॉर्टी फोर" }, { ch:"45", voice:"फॉर्टी फाइव" },  
+  { ch:"46", voice:"फॉर्टी सिक्स" }, { ch:"47", voice:"फॉर्टी सेवन" }, { ch:"48", voice:"फॉर्टी एट" }, { ch:"49", voice:"फॉर्टी नाइन" }, { ch:"50", voice:"फिफ़्टी" },  
+  
+  { ch:"51", voice:"फिफ़्टी वन" }, { ch:"52", voice:"फिफ़्टी टू" }, { ch:"53", voice:"फिफ़्टी थ्री" }, { ch:"54", voice:"फिफ़्टी फोर" }, { ch:"55", voice:"फिफ़्टी फाइव" },  
+  { ch:"56", voice:"फिफ़्टी सिक्स" }, { ch:"57", voice:"फिफ़्टी सेवन" }, { ch:"58", voice:"फिफ़्टी एट" }, { ch:"59", voice:"फिफ़्टी नाइन" }, { ch:"60", voice:"सिक्स्टी" },  
+  
+  { ch:"61", voice:"सिक्स्टी वन" }, { ch:"62", voice:"सिक्स्टी टू" }, { ch:"63", voice:"सिक्स्टी थ्री" }, { ch:"64", voice:"सिक्स्टी फोर" }, { ch:"65", voice:"सिक्स्टी फाइव" },  
+  { ch:"66", voice:"सिक्स्टी सिक्स" }, { ch:"67", voice:"सिक्स्टी सेवन" }, { ch:"68", voice:"सिक्स्टी एट" }, { ch:"69", voice:"सिक्स्टी नाइन" }, { ch:"70", voice:"सेवेंट्टी" },  
+  
+  { ch:"71", voice:"सेवेंट्टी वन" }, { ch:"72", voice:"सेवेंट्टी टू" }, { ch:"73", voice:"सेवेंट्टी थ्री" }, { ch:"74", voice:"सेवेंट्टी फोर" }, { ch:"75", voice:"सेवेंट्टी फाइव" },  
+  { ch:"76", voice:"सेवेंट्टी सिक्स" }, { ch:"77", voice:"सेवेंट्टी सेवन" }, { ch:"78", voice:"सेवेंट्टी एट" }, { ch:"79", voice:"सेवेंट्टी नाइन" }, { ch:"80", voice:"एटी" },  
+  
+  { ch:"81", voice:"एटी वन" }, { ch:"82", voice:"एटी टू" }, { ch:"83", voice:"एटी थ्री" }, { ch:"84", voice:"एटी फोर" }, { ch:"85", voice:"एटी फाइव" },  
+  { ch:"86", voice:"एटी सिक्स" }, { ch:"87", voice:"एटी सेवन" }, { ch:"88", voice:"एटी एट" }, { ch:"89", voice:"एटी नाइन" }, { ch:"90", voice:"नाइंटी" },  
+  
+  { ch:"91", voice:"नाइंटी वन" }, { ch:"92", voice:"नाइंटी टू" }, { ch:"93", voice:"नाइंटी थ्री" }, { ch:"94", voice:"नाइंटी फोर" }, { ch:"95", voice:"नाइंटी फाइव" },  
+  { ch:"96", voice:"नाइंटी सिक्स" }, { ch:"97", voice:"नाइंटी सेवन" }, { ch:"98", voice:"नाइंटी एट" }, { ch:"99", voice:"नाइंटी नाइन" }, { ch:"100", voice:"वन हंड्रेड" }  
+],  
+  
+  abc: [  
+  { ch:"A", voice:"ए" },  
+  { ch:"B", voice:"बी" },  
+  { ch:"C", voice:"सी" },  
+  { ch:"D", voice:"डी" },  
+  { ch:"E", voice:"ई" },  
+  { ch:"F", voice:"एफ" },  
+  { ch:"G", voice:"जी" },  
+  { ch:"H", voice:"एच" },  
+  { ch:"I", voice:"आई" },  
+  { ch:"J", voice:"जे" },  
+  { ch:"K", voice:"के" },  
+  { ch:"L", voice:"एल" },  
+  { ch:"M", voice:"एम" },  
+  { ch:"N", voice:"एन" },  
+  { ch:"O", voice:"ओ" },  
+  { ch:"P", voice:"पी" },  
+  { ch:"Q", voice:"क्यू" },  
+  { ch:"R", voice:"आर" },  
+  { ch:"S", voice:"एस" },  
+  { ch:"T", voice:"टी" },  
+  { ch:"U", voice:"यू" },  
+  { ch:"V", voice:"वी" },  
+  { ch:"W", voice:"डबल्यू" },  
+  { ch:"X", voice:"एक्स" },  
+  { ch:"Y", voice:"वाई" },  
+  { ch:"Z", voice:"ज़ेड" }  
+],  
+  
+  art: [  
+  { ch:"⭐", voice:"स्टार" },  
+  { ch:"🌈", voice:"इंद्रधनुष" },  
+  { ch:"❤️", voice:"दिल" },  
+  { ch:"🍋", voice:"नींबू" },  
+  { ch:"💋", voice:"होंठ" },  
+  { ch:"🦴", voice:"हड्डी" },  
+  { ch:"🖐️", voice:"पंजा" },  
+  { ch:"🙂", voice:"चेहरा" },  
+  { ch:"🥄", voice:"चम्मच" },  
+  { ch:"🔪", voice:"चाकू" },  
+  { ch:"🚅", voice:"ट्रेन" },  
+  { ch:"☀️", voice:"सूरज" },  
+  { ch:"🌙", voice:"चांद" },  
+  { ch:"☁️", voice:"बादल" },  
+  { ch:"🍎", voice:"सेब" },  
+  { ch:"🍌", voice:"केला" },  
+  { ch:"🍓", voice:"स्ट्रॉबेरी" },  
+  { ch:"🎈", voice:"बलून" },  
+  { ch:"🎀", voice:"रिबन" },  
+  { ch:"🐥", voice:"चिड़िया" },  
+  { ch:"🥭", voice:"आम" },  
+  { ch:"🍊", voice:"संतरा" },  
+  { ch:"🍅", voice:"टमाटर" },  
+  { ch:"🍐", voice:"नाशपाती" },  
+  { ch:"🍏", voice:"हरा सेब" },  
+  { ch:"🌀", voice:"चक्र" },  
+  { ch:"🍉", voice:"तरबूज" },  
+  { ch:"🌱", voice:"पौधा" },  
+  { ch:"🌶️", voice:"मिर्च" },  
+  { ch:"🍆", voice:"बैंगन" },  
+  { ch:"🥚", voice:"अंडा" },  
+  { ch:"🍞", voice:"ब्रेड" },  
+  { ch:"🥕", voice:"गाजर" },  
+  { ch:"🍄", voice:"मशरूम" },  
+  { ch:"🫑", voice:"शिमला मिर्च" },  
+  { ch:"🍡", voice:"लड्डू" },  
+  { ch:"🍪", voice:"पिज्जा" },  
+  { ch:"🫖", voice:"केतली" },  
+  { ch:"🛖", voice:"झोपड़ी" },  
+  { ch:"🖌️", voice:"ब्रश" }  
+],  
+};  
+const MAX_DRAWINGS = {};  
+Object.keys(DATA).forEach(key => {  
+  MAX_DRAWINGS[key] = DATA[key].length;  
+});  
+/* ================= BASIC ================= */  
+const base=document.getElementById("base");  
+const draw=document.getElementById("draw");  
+const stage = document.getElementById("stage");  
+const bctx=base.getContext("2d");  
+const dctx=draw.getContext("2d");  
+const DPR=window.devicePixelRatio||1;  
+   
+  
+/* ================= BASIC STATE ================= */  
+let mode="vyanjan",index=0;  
+let appStarting = true;  
+  
+/* ================= NAME ================= */  
+let child=localStorage.getItem("CHILD")||"";  
+nameBtn.innerText=child||"Name";  
+nameBtn.onclick=()=>{  
+  const n=prompt("बच्चे का नाम",child);  
+  if(n){  
+    child=n.trim();  
+    localStorage.setItem("CHILD",child);  
+    nameBtn.innerText=child;  
+  }  
+};  
+  
+/* ================= HELP (FINAL LONG PRESS CALL – FIXED) ================= */  
+  
+const helpBtn = document.getElementById("helpBtn");  
+  
+let helpTimer = null;  
+let helpStart = 0;  
+let helpLastSpoken = 0;  
+let helpReachedTen = false;  
+  
+function speakHelp(text){  
+  speechSynthesis.cancel();  
+  const u = new SpeechSynthesisUtterance(text);  
+  u.lang = "hi-IN";  
+  u.rate = 0.9;  
+  u.pitch = 1.1;  
+  speechSynthesis.speak(u);  
+}  
+  
+function stopHelpAll(){  
+  clearInterval(helpTimer);  
+  helpTimer = null;  
+  speechSynthesis.cancel();  
+}  
+  
+helpBtn.addEventListener("pointerdown", e=>{  
+  e.preventDefault();  
+  
+  stopHelpAll();  
+  
+  helpStart = Date.now();  
+  helpLastSpoken = 0;  
+  helpReachedTen = false;  
+  
+  // पहली आवाज  
+  speakHelp("सहायता हेतु हेल्प बटन को मिनिमम दस सेकंड तक दबाकर रखें");  
+  
+  helpTimer = setInterval(()=>{  
+    const elapsed = Math.floor((Date.now() - helpStart) / 1000);  
+  
+    // 6–9 सेकंड की गिनती  
+    if(elapsed >= 6 && elapsed <= 9 && elapsed !== helpLastSpoken){  
+      helpLastSpoken = elapsed;  
+      speakHelp(elapsed.toString());  
+    }  
+  
+    // ठीक 10 सेकंड  
+    if(elapsed === 10 && !helpReachedTen){  
+      helpReachedTen = true;  
+      helpLastSpoken = 10;  
+      speakHelp("दस। अब बटन छोड़ दें");  
+    }  
+  
+  }, 200);  
+});  
+  
+helpBtn.addEventListener("pointerup", ()=>{  
+  const total = Math.floor((Date.now() - helpStart) / 1000);  
+  stopHelpAll();  
+  
+  if(total >= 10){  
+    window.location.href = "tel:6393998216";  
+  }  
+});  
+  
+helpBtn.addEventListener("pointerleave", stopHelpAll);  
+helpBtn.addEventListener("pointercancel", stopHelpAll);  
+  
+/* ================= CANVAS RESIZE (FINAL SAFE) ================= */  
+function resize(){  
+  
+  // ❌ App start पर blank save मत करो  
+  if(!appStarting){  
+    savePage();  
+  }  
+  
+  const r = stage.getBoundingClientRect();  
+  
+  [base, draw].forEach(c=>{  
+    c.width  = Math.floor(r.width * DPR);  
+    c.height = Math.floor(r.height * DPR);  
+    c.style.width  = r.width + "px";  
+    c.style.height = r.height + "px";  
+  });  
+  
+  bctx.setTransform(DPR,0,0,DPR,0,0);  
+  dctx.setTransform(DPR,0,0,DPR,0,0);  
+  
+  drawBase();  
+  loadPage();  
+}  
+  
+window.addEventListener("resize", resize);  
+window.addEventListener("orientationchange", resize);  
+  
+// ===== FIXED drawBase (replace सभी पुराने drawBase को यही से) =====  
+function drawBase(){  
+  const it = DATA[mode][index];  
+  bctx.clearRect(0,0,base.width,base.height);  
+  
+  bctx.textAlign = "center";  
+  bctx.textBaseline = "middle";  
+  bctx.font = "240px Arial";  
+  
+  if(mode === "art"){  
+    bctx.globalAlpha = 0.25;  
+    bctx.fillStyle = "#000";  
+  } else {  
+    bctx.globalAlpha = 1;  
+    bctx.fillStyle = "#ddd";  
+  }  
+  
+  bctx.fillText(  
+    it.ch,  
+    base.width / DPR / 2,  
+    base.height / DPR / 2  
+  );  
+  
+  bctx.globalAlpha = 1; // reset  
+}  
+  
+/* ================= TOOLS ================= */  
+const sizes=[6,10,16,22];  
+let sizeIndex=1;  
+// ===== CURRENT SELECTED TOOL =====  
+let currentTool = "pen"; // pen | color | pattern | eraser  
+// ===== ERASER SIZES (INDEPENDENT) =====  
+const eraserSizes = [12, 20, 30, 45];  
+let eraserSizeIndex = 1;  
+  
+const colors=["#e53935","#43a047","#fdd835","#fb8c00","#8e24aa","#6d4c41","#000000","#ffffff","#757575","#26c6da","#d81b60","#7cb342","#c0ca33","#ff7043","#5e35b1","#00897b","#f06292","#90a4ae","#a1887f","#FFD700","#C9B037","#E6BE8A","#C0C0C0","#BFC1C2","#8E8E93","#CD7F32","#B87333","#1e88e5"];  
+let colorIndex=0;  
+const sizeNames = [  
+  "छोटी पेंसिल",  
+  "मध्यम पेंसिल",  
+  "बड़ी पेंसिल",  
+  "बहुत बड़ी पेंसिल"  
+];  
+  
+const eraserNames = [  
+  "छोटा रबर",  
+  "मध्यम रबर",  
+  "बड़ा रबर",  
+  "बहुत बड़ा रबर"  
+];  
+  
+const colorNames = [  
+  "लाल रंग",  
+  "हरा रंग",  
+  "पीला रंग",  
+  "नारंगी रंग",  
+  "बैंगनी रंग",  
+  "भूरा रंग",  
+  "काला रंग",  
+  "सफेद रंग",  
+  "स्लेटी रंग",  
+  "आसमानी रंग",  
+  "गुलाबी रंग",  
+  "हल्का हरा रंग",  
+  "नींबू रंग",  
+  "मूंगा रंग",  
+  "गहरा बैंगनी रंग",  
+  "फिरोज़ी रंग",  
+  "हल्का गुलाबी रंग",  
+  "नीला स्लेटी रंग",  
+  "मिट्टी रंग",  
+  "नीला रंग",  
+  "गोल्डन रंग",  
+  "गहरा गोल्डन रंग",  
+  "हल्का गोल्डन रंग",  
+  "सिल्वर रंग",  
+  "हल्का सिल्वर रंग",  
+  "गहरा सिल्वर रंग",  
+  "ब्रॉन्ज रंग",  
+  "कॉपर रंग"  
+];  
+  
+const patternNames = [  
+  "स्टार डिज़ाइन",  
+  "फूल डिज़ाइन",  
+  "हार्ट डिज़ाइन",  
+  "रोज डिजाइन",  
+  "बलून डिजाइन",  
+  "फायर डिजाइन",  
+  "एप्पल डिजाइन",  
+  "तिरंगा डिजाइन",  
+  "फ्लैग डिजाइन",  
+  "पंजा डिजाइन",  
+  "मनी डिजाइन",  
+  "मछली डिज़ाइन"  
+];  
+/* ================= KIDS SHAPES PATTERN BRUSH ================= */  
+let patternIndex = 0;  
+const patterns = ["⭐","🌼","❤️","🌹","🎈","🔥","🍎","🇮🇳","🚩","🖐️","💵","🐟"]; // Kids-friendly  
+  
+function cyclePattern(){  
+  if(currentTool !== "pattern"){  
+    currentTool = "pattern";  
+    isEraser = false;  
+    speakText(patternNames[patternIndex]);  
+    return;  
+  }  
+  
+  patternIndex = (patternIndex + 1) % patterns.length;  
+  speakText(patternNames[patternIndex]);  
+}  
+  
+function makePattern(){  
+  const unit = sizes[sizeIndex] * 1.8;  
+  const pc = document.createElement("canvas");  
+  pc.width = unit;  
+  pc.height = unit;  
+  
+  const cx = pc.getContext("2d");  
+  cx.fillStyle = colors[colorIndex];  
+  cx.font = unit + "px sans-serif";  
+  cx.textAlign = "center";  
+  cx.textBaseline = "middle";  
+  
+  cx.clearRect(0,0,unit,unit);  
+  cx.fillText(patterns[patternIndex], unit/2, unit/2);  
+  
+  return dctx.createPattern(pc,"repeat");  
+}  
+  
+/* ================= LICENSE SYSTEM ================= */  
+  
+// ===== Activation ID =====  
+let actIdVal = localStorage.getItem("ACT_ID");  
+if(!actIdVal){  
+  actIdVal = "C-" + Math.floor(Math.random()*1e12);  
+  localStorage.setItem("ACT_ID", actIdVal);  
+}  
+actId.innerText = actIdVal;  
+  
+// ===== Trial =====  
+const TRIAL_MS = 5*60*1000;  
+let trialStart = +localStorage.getItem("TRIAL_START") || Date.now();  
+localStorage.setItem("TRIAL_START", trialStart);  
+  
+// ===== HIDDEN SECRET =====  
+function _k1(){ return [72,73,78,68,73]; }   // H I N D I  
+function _k2(){ return [64,50,48,50,53]; }   // @2025  
+function _k3(){ return [33,91,42]; }         // noise  
+  
+function buildSecret(){  
+  return _k1()  
+    .concat(_k3())  
+    .concat(_k2())  
+    .map(c=>String.fromCharCode(c))  
+    .join("");  
+}  
+  
+// ===== STRONG HASH =====  
+function hash(str){  
+  let h = 2166136261;  
+  for(let i=0;i<str.length;i++){  
+    h ^= str.charCodeAt(i);  
+    h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);  
+  }  
+  return (h>>>0).toString(36);  
+}  
+  
+// ===== FINAL CODE LOGIC (ID ONLY) =====  
+function genCode(){  
+  const raw =  
+    actIdVal +  
+    buildSecret() +  
+    actIdVal.split("-")[1].slice(0,4);  
+  
+  return hash(raw).slice(0,12).toUpperCase();  
+}  
+  
+// ===== LICENSE CHECK =====  
+function checkLicense(){  
+  const exp = +localStorage.getItem("PLAN_EXP") || 0;  
+  if(Date.now() < exp){  
+    planInfo.innerText =  
+      "Valid till " + new Date(exp).toLocaleDateString();  
+    license.style.display = "none";  
+    return;  
+  }  
+  if(Date.now() - trialStart > TRIAL_MS){  
+    license.style.display = "block";  
+  }  
+}  
+setInterval(checkLicense,1000);  
+  
+// ===== ACTIVATE =====  
+function activate(){  
+  if(code.value.trim().toUpperCase() === genCode()){  
+    const exp = Date.now() + 365*24*60*60*1000;  
+    localStorage.setItem("PLAN_EXP", exp);  
+    license.style.display = "none";  
+    alert("Activation Successful");  
+  }else{  
+    alert("Invalid Code");  
+  }  
+}  
+  
+// ===== CONTACT =====  
+function callNow(){  
+  location.href = "tel:+916393998216";  
+}  
+function waNow(){  
+  location.href =  
+    "https://wa.me/916393998216?text=" +  
+    encodeURIComponent("Activation ID: " + actIdVal);  
+}  
+/* ================= PAGE + MODE SYSTEM ================= */  
+  
+function setMode(m){  
+  if(drawing) savePage();  
+  mode = m;  
+  index = 0;  
+  loadPage();  
+  speak();  
+}  
+  
+/* ===== PAGE FLIP LOCK ===== */  
+let flipping = false;  
+  
+function nextPage(){  
+  if(flipping) return;  
+  flipping = true;  
+  
+  // 👉 next index  
+  index = (index + 1) % DATA[mode].length;  
+  
+  // 🧠 LAST PAGE SAVE (यही main line है)  
+  localStorage.setItem("LAST_MODE", mode);  
+  localStorage.setItem("LAST_INDEX", index);  
+  
+  loadPage();  
+  playFlipAndSpeak();  
+  
+  setTimeout(()=>flipping=false,150);  
+}  
+  
+function prevPage(){  
+  if(flipping) return;  
+  flipping = true;  
+  
+  // 👉 previous index  
+  index = (index - 1 + DATA[mode].length) % DATA[mode].length;  
+  
+  // 🧠 LAST PAGE SAVE (यही main line है)  
+  localStorage.setItem("LAST_MODE", mode);  
+  localStorage.setItem("LAST_INDEX", index);  
+  
+  loadPage();  
+  playFlipAndSpeak();  
+  
+  setTimeout(()=>flipping=false,150);  
+}  
+  
+function playFlipAndSpeak(){  
+  speak();  
+}  
+  
+/* ================= VOICE ================= */  
+function speak(){  
+  if(!window.speechSynthesis) return;  
+  
+  speechSynthesis.cancel();  
+  
+  const it = DATA[mode][index];  
+  const name = child ? child + " " : "";  
+  const bol = name + it.voice + " बनाओ";  
+  
+  const u = new SpeechSynthesisUtterance(bol);  
+  u.lang = "hi-IN";  
+  u.rate = 0.9;  
+  u.pitch = 1.1;  
+  
+  speechSynthesis.speak(u);  
+}  
+  
+function speakText(text){  
+  if(!window.speechSynthesis) return;  
+  
+  speechSynthesis.cancel();  
+  
+  const u = new SpeechSynthesisUtterance(text);  
+  u.lang = "hi-IN";  
+  u.rate = 0.9;  
+  u.pitch = 1.1;  
+  
+  speechSynthesis.speak(u);  
+}  
+  
+/* ========= FINAL DRAW + SAVE + PAGE SYSTEM (STABLE) ========= */  
+/* ===== STORAGE SIZE (BYTES) ===== */  
+function storageSize(){  
+  let total = 0;  
+  for(let k in localStorage){  
+    if(!localStorage.hasOwnProperty(k)) continue;  
+    total += localStorage[k].length * 2; // UTF-16  
+  }  
+  return total;  
+}  
+  
+/* ===== GLOBAL STORAGE LIMIT (SAFE) ===== */  
+const MAX_STORAGE = 4.5 * 1024 * 1024; // 4.5 MB  
+  
+/* ===== GLOBAL CLEANUP (OLDEST FIRST) ===== */  
+function cleanupStorage(){  
+  let keys = Object.keys(localStorage)  
+    .filter(k => k.startsWith("DRAW_") && !k.endsWith("_TIME"));  
+  
+  while(storageSize() > MAX_STORAGE && keys.length){  
+    const oldestKey = getOldestKey(keys);  
+    if(!oldestKey) break;  
+  
+    localStorage.removeItem(oldestKey);  
+    localStorage.removeItem(oldestKey + "_TIME");  
+  
+    keys = keys.filter(k => k !== oldestKey);  
+  }  
+}  
+  
+/* ===== SAVE / LOAD (ABSOLUTE SAFE) ===== */  
+function savePage(){  
+  try{  
+    cleanupStorage(); // 🔥 सबसे जरूरी  
+  
+    const key = `DRAW_${mode}_${index}`;  
+  
+    // 🔥 PNG → JPEG (0.6 quality)  
+    const url = draw.toDataURL("image/jpeg", 0.6);  
+  
+    localStorage.setItem(key, url);  
+    localStorage.setItem(key + "_TIME", Date.now());  
+  
+  }catch(e){  
+    console.warn("Save skipped (storage full)");  
+  }  
+}  
+  
+function getOldestKey(drawings){  
+    let oldestKey = null;  
+    let oldestTime = Infinity;  
+    drawings.forEach(key => {  
+        const time = +localStorage.getItem(key + "_TIME") || 0;  
+        if(time < oldestTime){  
+            oldestTime = time;  
+            oldestKey = key;  
+        }  
+    });  
+    return oldestKey;  
+}  
+  
+ function loadPage(){  
+  dctx.clearRect(0,0,draw.width,draw.height);  
+  drawBase();  
+  
+  const data = localStorage.getItem(`DRAW_${mode}_${index}`);  
+  if(!data) return;  
+  
+  const img = new Image();  
+  img.onload = ()=>{  
+    dctx.drawImage(  
+      img,  
+      0,  
+      0,  
+      draw.width / DPR,  
+      draw.height / DPR  
+    );  
+  };  
+  img.src = data;  
+}  
+  
+/* ===== AUTO SAVE (SAFE – NEVER SAVE BLANK) ===== */  
+setInterval(()=>{  
+  if(drawing){          // ✅ सिर्फ तभी save होगा जब बच्चा draw कर रहा हो  
+    savePage();  
+  }  
+},1000);  
+  
+/* ===== DRAW STATE ===== */  
+let drawing=false;  
+let lastX=0,lastY=0;  
+let activePointer=null;  
+let zone=null;  
+let isEraser=false;  
+let previousTool = "pen";  
+  
+/* ===== POINTER POSITION FIX (NO SHIFT) ===== */  
+function getPos(e){  
+  const r = draw.getBoundingClientRect();  
+  return {  
+    x: e.clientX - r.left,  
+    y: e.clientY - r.top  
+  };  
+}  
+  
+  
+draw.addEventListener("pointerdown", e => {  
+  e.preventDefault();  
+  draw.setPointerCapture(e.pointerId);  
+  
+  if(activePointer !== null) return;  
+  activePointer = e.pointerId;  
+  
+  const r = draw.getBoundingClientRect();  
+  const x = e.clientX - r.left;  
+  
+    
+  zone = "draw";  
+  drawing = true;  
+  
+  const p = getPos(e);  
+  lastX = p.x;  
+  lastY = p.y;  
+  
+  dctx.lineCap = "round";  
+  dctx.lineJoin = "round";  
+  if(isEraser){  
+  dctx.lineWidth = eraserSizes[eraserSizeIndex];  
+}else{  
+  dctx.lineWidth = sizes[sizeIndex];  
+}  
+  // ===== F I N A L : Pattern Brush / Pencil / Eraser =====  
+  if(isEraser){  
+    dctx.globalCompositeOperation = "destination-out";  
+  }else{  
+    dctx.globalCompositeOperation = "source-over";  
+  
+   if(currentTool === "pattern"){  
+     dctx.strokeStyle = makePattern();  
+  }else{  
+    dctx.strokeStyle = colors[colorIndex];  
+  }  
+  }  
+});  
+  
+draw.addEventListener("pointermove", e => {  
+  if(!drawing || e.pointerId !== activePointer || zone !== "draw") return;  
+  e.preventDefault();  
+  
+  const p = getPos(e);  
+  dctx.beginPath();  
+  dctx.moveTo(lastX, lastY);  
+  dctx.lineTo(p.x, p.y);  
+  dctx.stroke();  
+  
+  lastX = p.x;  
+  lastY = p.y;  
+});  
+  
+draw.addEventListener("pointerup", e => {  
+  if(e.pointerId !== activePointer) return;  
+  drawing = false;  
+  draw.releasePointerCapture(e.pointerId);  
+  savePage(); // ✅ सीधे save  
+  activePointer = null;  
+  zone = null;  
+  // रबड़ का उपयोग करने के बाद, पिछली स्थिति में आ जाएं  
+  if(isEraser){  
+    isEraser = false;  
+    currentTool = previousTool;  
+    speakText("रबड़ बंद हो गया"); // रबड़ बंद होने की आवाज  
+  }  
+});  
+  
+draw.addEventListener("pointercancel", () => {  
+  drawing = false;  
+  activePointer = null;  
+  zone = null;  
+});  
+  
+/* ===== TOOLS ===== */  
+function eraser(){  
+  if(isEraser){  
+    eraserSizeIndex = (eraserSizeIndex + 1) % eraserSizes.length;  
+  }  
+  previousTool = currentTool; // पिछली स्थिति को संग्रहीत करें  
+  currentTool = "eraser";  
+  isEraser = true;  
+  speakText(eraserNames[eraserSizeIndex]);  
+}  
+  
+function cycleColor(){  
+  if(currentTool !== "color"){  
+    currentTool = "color";  
+    isEraser = false;  
+  
+    speakText(colorNames[colorIndex]);  
+    return;  
+  }  
+  
+  colorIndex = (colorIndex + 1) % colors.length;  
+  speakText(colorNames[colorIndex]);  
+}  
+  
+function cycleSize(){  
+  // अगर पहली बार पेंसिल select हो रही है  
+  if(currentTool !== "pen"){  
+    currentTool = "pen";  
+    isEraser = false;  
+  
+    speakText(sizeNames[sizeIndex]);  
+    return;  
+  }  
+  
+  // अगर पेंसिल पहले से selected है → size बदले  
+  sizeIndex = (sizeIndex + 1) % sizes.length;  
+  speakText(sizeNames[sizeIndex]);  
+}  
+  
+function clearPage(){  
+  localStorage.removeItem(`DRAW_${mode}_${index}`);  
+  localStorage.removeItem(`DRAW_${mode}_${index}_TIME`);  
+  loadPage();  
+  speakText("पेज़ साफ़ हो गया");  
+}  
+  
+// === TOOL BUTTON SAFE DRAG + TAP (Boundary + Save) ===  
+const tools = document.querySelectorAll(".tool");  
+let dragEl = null;  
+let startX = 0, startY = 0;  
+let dragging = false;  
+  
+// --- RESTORE POSITIONS ---  
+tools.forEach(btn=>{  
+  const saved = localStorage.getItem("tool-pos-" + btn.dataset.tool);  
+  if (saved){  
+    const pos = JSON.parse(saved);  
+    btn.style.left = pos.left;  
+    btn.style.top  = pos.top;  
+  }  
+});  
+  
+tools.forEach(btn => {  
+  
+  btn.addEventListener("pointerdown", e => {  
+    startX = e.clientX;  
+    startY = e.clientY;  
+    dragging = false;  
+    dragEl = btn;  
+    dragEl.setPointerCapture(e.pointerId);  
+  });  
+  
+  btn.addEventListener("pointermove", e => {  
+  if (!dragEl) return;  
+  
+  const r = stage.getBoundingClientRect();  
+  
+  let x = e.clientX - r.left - dragEl.offsetWidth / 2;  
+  let y = e.clientY - r.top  - dragEl.offsetHeight / 2;  
+  
+  // 🔒 Y boundary (सब tools के लिए)  
+  y = Math.max(0, Math.min(y, r.height - dragEl.offsetHeight));  
+  
+  // 🔒 PAGE BUTTONS (X fixed)  
+  if (dragEl.dataset.tool === "prev") {  
+    x = 0;  
+  }   
+  else if (dragEl.dataset.tool === "next") {  
+    x = r.width - dragEl.offsetWidth;  
+  }   
+  else {  
+    // 🔒 बाकी tools के लिए full boundary  
+    x = Math.max(0, Math.min(x, r.width - dragEl.offsetWidth));  
+  }  
+  
+  if (!dragging && Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {  
+    dragging = true;  
+  }  
+  if (!dragging) return;  
+  
+  dragEl.style.left = x + "px";  
+  dragEl.style.top  = y + "px";  
+});  
+  
+  btn.addEventListener("pointerup", e => {  
+  
+  if (!dragEl) return;  
+  
+  const r = stage.getBoundingClientRect();  
+  
+  let x = dragEl.offsetLeft;  
+  let y = dragEl.offsetTop;  
+  
+  const w = dragEl.offsetWidth;  
+  const h = dragEl.offsetHeight;  
+  
+  // 🔒 PAGE BUTTONS – fixed edges  
+  if (dragEl.dataset.tool === "prev") {  
+    dragEl.style.left = "0px";  
+  }   
+  else if (dragEl.dataset.tool === "next") {  
+    dragEl.style.left = (r.width - w) + "px";  
+  }   
+  else {  
+    // 🧲 SNAP TO NEAREST EDGE (4 sides)  
+  
+    const distLeft   = x;  
+    const distRight  = r.width - (x + w);  
+    const distTop    = y;  
+    const distBottom = r.height - (y + h);  
+  
+    const min = Math.min(  
+      distLeft, distRight, distTop, distBottom  
+    );  
+  
+    if (min === distLeft) {  
+      x = 0;  
+    } else if (min === distRight) {  
+      x = r.width - w;  
+    } else if (min === distTop) {  
+      y = 0;  
+    } else if (min === distBottom) {  
+      y = r.height - h;  
+    }  
+  
+    dragEl.style.left = x + "px";  
+    dragEl.style.top  = y + "px";  
+  }  
+  
+  // 💾 position save  
+  localStorage.setItem(  
+    "tool-pos-" + dragEl.dataset.tool,  
+    JSON.stringify({  
+      left: dragEl.style.left,  
+      top:  dragEl.style.top  
+    })  
+  );  
+  
+  dragEl = null;  
+  dragging = false;  
+});  
+  
+});  
+  
+/* ================= INIT ================= */  
+// 🧠 App reopen पर last page restore  
+(function(){  
+  const m = localStorage.getItem("LAST_MODE");  
+  const i = localStorage.getItem("LAST_INDEX");  
+  
+  if(m && DATA[m]){  
+    mode = m;  
+    index = i ? parseInt(i,10) : 0;  
+  }  
+})();  
+  
+resize();  
+appStarting = false;   // 🔓 अब save allow है  
+checkLicense();  
+</script>  <script>  
+if ("serviceWorker" in navigator) {  
+  let newWorker;  
+  
+  navigator.serviceWorker.register("sw.js");  
+  
+  let refreshing = false;  
+  
+navigator.serviceWorker.addEventListener("controllerchange", () => {  
+  if (refreshing) return;  
+  refreshing = true;  
+  window.location.reload();  
+});  
+  
+  navigator.serviceWorker.getRegistration().then(reg => {  
+    if (!reg) return;  
+  
+    if (reg.waiting) showUpdate(reg.waiting);  
+  
+    reg.addEventListener("updatefound", () => {  
+      newWorker = reg.installing;  
+      newWorker.addEventListener("statechange", () => {  
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {  
+          showUpdate(newWorker);  
+        }  
+      });  
+    });  
+  });  
+  
+  function showUpdate(worker) {  
+  
+  // 🔒 अगर पहले से update bar है तो नया मत बनाओ  
+  if (document.getElementById("update-bar")) return;  
+  
+  const bar = document.createElement("div");  
+  bar.id = "update-bar";  
+  
+  bar.style.cssText = `  
+    position:fixed;  
+    bottom:10px;  
+    left:10px;  
+    right:10px;  
+    background:#4caf50;  
+    color:#fff;  
+    padding:12px;  
+    border-radius:10px;  
+    font-size:16px;  
+    display:flex;  
+    justify-content:space-between;  
+    align-items:center;  
+    z-index:9999;  
+  `;  
+  
+  bar.innerHTML = `  
+    🔄 नया अपडेट आया है  
+    <button style="padding:6px 12px;border:none;border-radius:6px">  
+      Refresh  
+    </button>  
+  `;  
+  
+  bar.querySelector("button").onclick = () => {  
+    worker.postMessage("SKIP_WAITING");  
+  };  
+  
+  document.body.appendChild(bar);  
+}  
+}  
+</script>  
+</body>  
+</html> 
