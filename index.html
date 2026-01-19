@@ -139,7 +139,7 @@ canvas{
   <canvas id="draw"></canvas>  <button class="tool" data-tool="pen" onclick="cycleSize()">✏️</button>
 <button class="tool" data-tool="pattern" onclick="cyclePattern()">🎭</button>
 <button class="tool" data-tool="color" onclick="cycleColor()">🎨</button>
-<button class="tool clear" data-tool="clear" onclick="clearPage()">🧹</button>
+<button class="tool clear" data-tool="clear" id="clearBtn">🧹</button>
 <button class="tool" data-tool="eraser" onclick="eraser()">🧽</button>
 <button class="tool nav prev" data-tool="prev" onclick="prevPage()">⬅️</button>
 <button class="tool nav next" data-tool="next" onclick="nextPage()">➡️</button>
@@ -164,7 +164,124 @@ canvas{
     <input id="code" placeholder="Activation Code"><br><br>  
     <button onclick="activate()">Activate</button>  
   </div>  
-</div>  <script>  
+</div>
+<input id="yesBox"
+  placeholder="YES लिखें"
+  style="
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:10px 16px;
+    font-size:18px;
+    border:2px solid #333;
+    border-radius:8px;
+    display:none;
+    z-index:99999;
+  "
+>
+<script>
+/* ================= STORAGE CORE (FINAL) ================= */
+
+let DB = null;
+const DB_NAME = "DRAW_APP_DB";
+const STORE = "drawings";
+
+/* ---------- INIT ---------- */
+(function initDB(){
+  try{
+    const req = indexedDB.open(DB_NAME,1);
+
+    req.onupgradeneeded = e=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(STORE)){
+        db.createObjectStore(STORE);
+      }
+    };
+
+    req.onsuccess = e=>{
+      DB = e.target.result;
+    };
+
+    req.onerror = ()=>{
+      DB = null;
+    };
+  }catch(e){
+    DB = null;
+  }
+})();
+
+/* ---------- SAVE ---------- */
+function storageSave(key,value){
+  if(DB){
+    try{
+      const tx = DB.transaction(STORE,"readwrite");
+      tx.objectStore(STORE).put(value,key);
+      return;
+    }catch(e){
+      DB = null;
+    }
+  }
+  localStorage.setItem(key, JSON.stringify(value)); // <-- यही change
+}
+
+/* ---------- LOAD ---------- */
+function storageLoad(key,callback){
+  if(DB){
+    try{
+      const tx = DB.transaction(STORE,"readonly");
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = ()=>callback(req.result ?? JSON.parse(localStorage.getItem(key)));
+      req.onerror = ()=>callback(JSON.parse(localStorage.getItem(key)));
+      return;
+    }catch(e){
+      DB = null;
+    }
+  }
+  callback(JSON.parse(localStorage.getItem(key)));
+}
+
+/* ---------- DELETE ---------- */
+function storageDelete(key){
+  if(DB){
+    try{
+      const tx = DB.transaction(STORE,"readwrite");
+      tx.objectStore(STORE).delete(key);
+      return;
+    }catch(e){
+      DB = null;
+    }
+  }
+  localStorage.removeItem(key);
+}
+
+/* ---------- DELETE BY PREFIX (MODE CLEAR) ---------- */
+function storageDeleteByPrefix(prefix){
+  if(DB){
+    try{
+      const tx = DB.transaction(STORE,"readwrite");
+      const store = tx.objectStore(STORE);
+      store.openCursor().onsuccess = e=>{
+        const c = e.target.result;
+        if(c){
+          const key = String(c.key); // 🔥 FIX (index 0 issue)
+          if(key.startsWith(prefix)){
+            store.delete(c.key);
+          }
+          c.continue();
+        }
+      };
+    }catch(e){
+      DB = null;
+    }
+  }
+
+  Object.keys(localStorage).forEach(k=>{
+    if(k.startsWith(prefix)){
+      localStorage.removeItem(k);
+    }
+  });
+}
 /* ================= DATA ================= */  
  const DATA={  
   vyanjan: [  
@@ -395,12 +512,7 @@ helpBtn.addEventListener("pointerleave", stopHelpAll);
 helpBtn.addEventListener("pointercancel", stopHelpAll);  
   
 /* ================= CANVAS RESIZE (FINAL SAFE) ================= */  
-function resize(){  
-  
-  // ❌ App start पर blank save मत करो  
-  if(!appStarting){  
-    savePage();  
-  }  
+function resize(){
   
   const r = stage.getBoundingClientRect();  
   
@@ -731,80 +843,146 @@ function storageSize(){
 /* ===== GLOBAL STORAGE LIMIT (SAFE) ===== */  
 const MAX_STORAGE = 4.5 * 1024 * 1024; // 4.5 MB  
   
-/* ===== GLOBAL CLEANUP (OLDEST FIRST) ===== */  
-function cleanupStorage(){  
-  let keys = Object.keys(localStorage)  
-    .filter(k => k.startsWith("DRAW_") && !k.endsWith("_TIME"));  
-  
-  while(storageSize() > MAX_STORAGE && keys.length){  
-    const oldestKey = getOldestKey(keys);  
-    if(!oldestKey) break;  
-  
-    localStorage.removeItem(oldestKey);  
-    localStorage.removeItem(oldestKey + "_TIME");  
-  
-    keys = keys.filter(k => k !== oldestKey);  
-  }  
-}  
+/* =====================================================
+   FINAL STORAGE CLEANUP (TIME INSIDE INDEXEDDB RECORD)
+   ===================================================== */
+
+/*
+  Assumption (ALREADY DONE BY YOU):
+  storageSave(key, { image, time })
+  storageLoad(key, cb)
+  storageDelete(key)
+*/
+
+// 🔥 MAX PAGES LIMIT (जितना तुमने पहले रखा था वही रखो)
+const MAX_DRAW_PAGES = 196;
+
+/* ---------- CLEANUP STORAGE ---------- */
+function cleanupStorage(){
+
+  storageGetAll((records)=>{
+
+    // records = [{ key, value:{image,time} }, ...]
+
+    if(!records || records.length <= MAX_DRAW_PAGES) return;
+
+    // ⏱️ oldest first
+    records.sort((a,b)=>a.value.time - b.value.time);
+
+    const excess = records.length - MAX_DRAW_PAGES;
+
+    for(let i=0;i<excess;i++){
+      storageDelete(records[i].key);
+    }
+
+  });
+}
+
+/* ---------- STORAGE HELPERS (INDEXEDDB FIRST, FALLBACK SAFE) ---------- */
+function storageGetAll(cb){
+
+  if(!window.indexedDB){
+    // fallback → localStorage
+    const list = [];
+    for(let k in localStorage){
+      if(k.startsWith("DRAW_")){
+        try{
+          const v = JSON.parse(localStorage.getItem(k));
+          if(v && v.time) list.push({ key:k, value:v });
+        }catch(e){}
+      }
+    }
+    cb(list);
+    return;
+  }
+
+  const req = indexedDB.open(DB_NAME,1);
+
+  req.onsuccess = e=>{
+    const db = e.target.result;
+    const tx = db.transaction("drawings","readonly");
+    const store = tx.objectStore("drawings");
+
+    const list = [];
+    store.openCursor().onsuccess = ev=>{
+      const cursor = ev.target.result;
+      if(cursor){
+        if(cursor.value && cursor.value.time){
+          list.push({ key:cursor.key, value:cursor.value });
+        }
+        cursor.continue();
+      }else{
+        cb(list);
+      }
+    };
+  };
+
+  req.onerror = ()=>cb([]);
+}
   
 /* ===== SAVE / LOAD (ABSOLUTE SAFE) ===== */  
-function savePage(){  
-  try{  
-    cleanupStorage(); // 🔥 सबसे जरूरी  
+function savePage(){
+
+  // 🚫 बिना एक भी drawing → save नहीं
+  if(!hasDrawn) return;
+
+  try{
+    cleanupStorage();
+
+    const key = `DRAW_${mode}_${index}`;
+    const url = draw.toDataURL("image/jpeg", 0.6);
+
+    storageSave(key, {
+      image: url,
+      time: Date.now()
+    });
+
+  }catch(e){
+    console.warn("Save skipped");
+  }
+}
   
-    const key = `DRAW_${mode}_${index}`;  
-  
-    // 🔥 PNG → JPEG (0.6 quality)  
-    const url = draw.toDataURL("image/jpeg", 0.6);  
-  
-    localStorage.setItem(key, url);  
-    localStorage.setItem(key + "_TIME", Date.now());  
-  
-  }catch(e){  
-    console.warn("Save skipped (storage full)");  
-  }  
-}  
-  
-function getOldestKey(drawings){  
-    let oldestKey = null;  
-    let oldestTime = Infinity;  
-    drawings.forEach(key => {  
-        const time = +localStorage.getItem(key + "_TIME") || 0;  
-        if(time < oldestTime){  
-            oldestTime = time;  
-            oldestKey = key;  
-        }  
-    });  
-    return oldestKey;  
-}  
-  
- function loadPage(){  
-  dctx.clearRect(0,0,draw.width,draw.height);  
-  drawBase();  
-  
-  const data = localStorage.getItem(`DRAW_${mode}_${index}`);  
-  if(!data) return;  
-  
-  const img = new Image();  
-  img.onload = ()=>{  
-    dctx.drawImage(  
-      img,  
-      0,  
-      0,  
-      draw.width / DPR,  
-      draw.height / DPR  
-    );  
-  };  
-  img.src = data;  
-}  
+function loadPage(){
+
+  // ✅ CURRENT PAGE REMEMBER (FINAL FIX)
+  localStorage.setItem("LAST_MODE", mode);
+  localStorage.setItem("LAST_INDEX", index);
+
+  // 🔴 IMPORTANT: default → no drawing
+  hasDrawn = false;
+
+  // canvas clear + base
+  dctx.clearRect(0,0,draw.width,draw.height);
+  drawBase();
+
+  const key = `DRAW_${mode}_${index}`;
+
+  storageLoad(key, data => {
+
+    if(!data || !data.image) return;
+
+    const img = new Image();
+
+    img.onload = () => {
+      dctx.drawImage(
+        img,
+        0,
+        0,
+        draw.width / DPR,
+        draw.height / DPR
+      );
+
+      // ✅ image मिली → drawing exists
+      hasDrawn = true;
+    };
+
+    img.src = data.image;
+  });
+}
   
 /* ===== AUTO SAVE (SAFE – NEVER SAVE BLANK) ===== */  
-setInterval(()=>{  
-  if(drawing){          // ✅ सिर्फ तभी save होगा जब बच्चा draw कर रहा हो  
-    savePage();  
-  }  
-},1000);  
-  
+// 🔐 TRUE तभी होगा जब सच में कुछ draw हुआ हो
+let hasDrawn = false;
 /* ===== DRAW STATE ===== */  
 let drawing=false;  
 let lastX=0,lastY=0;  
@@ -849,8 +1027,14 @@ draw.addEventListener("pointerdown", e => {
   dctx.lineWidth = sizes[sizeIndex];  
 }  
   // ===== F I N A L : Pattern Brush / Pencil / Eraser =====  
-  if(isEraser){  
-    dctx.globalCompositeOperation = "destination-out";  
+  if (isEraser) {
+
+  // 🔥 HARD RESET — NO PATTERN / NO COLOR EFFECT
+  dctx.globalCompositeOperation = "destination-out";
+  dctx.strokeStyle = "rgba(0,0,0,1)"; // dummy solid color
+  dctx.fillStyle   = "rgba(0,0,0,1)";
+  dctx.setLineDash([]);              // safety
+
   }else{  
     dctx.globalCompositeOperation = "source-over";  
   
@@ -862,19 +1046,22 @@ draw.addEventListener("pointerdown", e => {
   }  
 });  
   
-draw.addEventListener("pointermove", e => {  
-  if(!drawing || e.pointerId !== activePointer || zone !== "draw") return;  
-  e.preventDefault();  
-  
-  const p = getPos(e);  
-  dctx.beginPath();  
-  dctx.moveTo(lastX, lastY);  
-  dctx.lineTo(p.x, p.y);  
-  dctx.stroke();  
-  
-  lastX = p.x;  
-  lastY = p.y;  
-});  
+  draw.addEventListener("pointermove", e => {
+  if(!drawing || e.pointerId !== activePointer || zone !== "draw") return;
+  e.preventDefault();
+
+  const p = getPos(e);
+
+  hasDrawn = true; // 🔥 draw हुआ
+
+  dctx.beginPath();
+  dctx.moveTo(lastX, lastY);
+  dctx.lineTo(p.x, p.y);
+  dctx.stroke();
+
+  lastX = p.x;
+  lastY = p.y;
+});
   
 draw.addEventListener("pointerup", e => {  
   if(e.pointerId !== activePointer) return;  
@@ -885,6 +1072,9 @@ draw.addEventListener("pointerup", e => {
   zone = null;  
   // रबड़ का उपयोग करने के बाद, पिछली स्थिति में आ जाएं  
   if(isEraser){  
+   
+   dctx.globalCompositeOperation = "source-over";
+
     isEraser = false;  
     currentTool = previousTool;  
     speakText("रबड़ बंद हो गया"); // रबड़ बंद होने की आवाज  
@@ -936,13 +1126,95 @@ function cycleSize(){
   speakText(sizeNames[sizeIndex]);  
 }  
   
-function clearPage(){  
-  localStorage.removeItem(`DRAW_${mode}_${index}`);  
-  localStorage.removeItem(`DRAW_${mode}_${index}_TIME`);  
-  loadPage();  
-  speakText("पेज़ साफ़ हो गया");  
-}  
-  
+/* ========= CLEAR BUTTON : SINGLE + DOUBLE TAP (FINAL FIX) ========= */
+
+const clearBtn = document.getElementById("clearBtn");
+const yesBox  = document.getElementById("yesBox");
+
+let clearTapCount = 0;
+let clearTapTimer = null;
+let clearModeArmed = false;
+
+/* 👇 CLEAR BUTTON TAP HANDLER */
+clearBtn.addEventListener("pointerdown", e=>{
+  e.preventDefault();
+
+  clearTapCount++;
+
+  // ⏱️ SINGLE TAP → current page
+  if(clearTapCount === 1){
+    clearTapTimer = setTimeout(()=>{
+      clearTapCount = 0;
+
+      dctx.clearRect(0,0,draw.width,draw.height);
+
+      storageDelete(`DRAW_${mode}_${index}`);
+      
+
+      hasDrawn = false;
+      loadPage();
+
+      speakText("पेज़ साफ़ हो गया");
+    },300);
+  }
+
+  // 🧨 DOUBLE TAP → mode clear
+  else if(clearTapCount === 2){
+    clearTimeout(clearTapTimer);
+    clearTapCount = 0;
+
+    clearModeArmed = true;
+    yesBox.value = "";
+    yesBox.style.display = "block";
+    yesBox.focus();
+
+    speakText("इस मोड की सभी ड्राइंग मिटाने के लिए YES लिखिए");
+  }
+});
+
+/* 👇 YES CONFIRM HANDLER */
+yesBox.addEventListener("keydown", e=>{
+  if(!clearModeArmed) return;
+
+  if(e.key === "Enter"){
+    if(yesBox.value.trim().toLowerCase() !== "yes"){
+      speakText("कृपया YES लिखें");
+      return;
+    }
+
+    clearModeArmed = false;
+    yesBox.style.display = "none";
+    yesBox.value = "";
+
+    storageDeleteByPrefix(`DRAW_${mode}_`);
+
+    dctx.clearRect(0,0,draw.width,draw.height);
+    loadPage();
+
+    speakText("इस मोड की सभी ड्राइंग साफ़ हो गई");
+  }
+});
+/* ===== YES BOX OUTSIDE TAP TO CLOSE (FINAL FIX) ===== */
+
+document.addEventListener("pointerdown", e => {
+
+  // अगर YES बॉक्स खुला ही नहीं है → कुछ मत करो
+  if (!clearModeArmed || yesBox.style.display !== "block") return;
+
+  // अगर क्लिक YES बॉक्स के अंदर हुआ है → ignore
+  if (yesBox.contains(e.target)) return;
+
+  // अगर क्लिक Clear बटन पर हुआ है → ignore (double tap logic)
+  if (clearBtn.contains(e.target)) return;
+
+  // 👉 बाहर क्लिक हुआ → YES बॉक्स बंद
+  clearModeArmed = false;
+  yesBox.style.display = "none";
+  yesBox.value = "";
+
+  speakText("क्लियर रद्द कर दिया गया");
+});
+
 // === TOOL BUTTON SAFE DRAG + TAP (Boundary + Save) ===  
 const tools = document.querySelectorAll(".tool");  
 let dragEl = null;  
@@ -1145,4 +1417,4 @@ navigator.serviceWorker.addEventListener("controllerchange", () => {
 }  
 </script>  
 </body>  
-</html> 
+</html>
