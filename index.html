@@ -150,7 +150,7 @@ canvas{
     <span id="actId"></span>  
   </p>    <div id="card">  
     <h2>Premium Plan</h2>  
-    <h1>₹249 / 1 Year</h1>  
+    <h1>₹299 / 1 Year</h1>  
     <p>  
       ✔ सभी गेम अनलॉक<br>  
       ✔ विज्ञापन नहीं<br>  
@@ -161,7 +161,7 @@ canvas{
     <button class="call" onclick="callNow()">📞 Call करें</button>  
     <button class="wa" onclick="waNow()">💬 WhatsApp करें</button>  
   </div>    <div style="text-align:center">  
-    <input id="code" placeholder="Activation Code"><br><br>  
+    <input id="code" placeholder="Activation Code (12 अक्षर)"><br><br>  
     <button onclick="activate()">Activate</button>  
   </div>  
 </div>
@@ -692,24 +692,37 @@ function buildSecret(){
 }  
   
 // ===== STRONG HASH =====  
-function hash(str){  
-  let h = 2166136261;  
-  for(let i=0;i<str.length;i++){  
-    h ^= str.charCodeAt(i);  
-    h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);  
-  }  
-  return (h>>>0).toString(36);  
-}  
+function hash(str){
+
+  let out = "";
+
+  let seed = 2166136261;
+
+  while(out.length < 12){
+
+    for(let i=0;i<str.length;i++){
+      seed ^= str.charCodeAt(i);
+      seed += (seed<<1)+(seed<<4)+(seed<<7)+(seed<<8)+(seed<<24);
+    }
+
+    out += (seed >>> 0).toString(36);
+    seed ^= out.length;
+  }
+
+  return out.slice(0,12).toUpperCase();
+}
   
-// ===== FINAL CODE LOGIC (ID ONLY) =====  
-function genCode(){  
-  const raw =  
-    actIdVal +  
-    buildSecret() +  
-    actIdVal.split("-")[1].slice(0,4);  
-  
-  return hash(raw).slice(0,12).toUpperCase();  
-}  
+// ===== FINAL SECURE CODE (PLAN HIDDEN) =====
+function genCode(planDays){
+
+  const raw =
+    actIdVal +                 // device specific
+    buildSecret() +            // secret
+    planDays +                 // 🔥 PLAN INSIDE (hidden)
+    actIdVal.split("-")[1].slice(0,4);
+
+  return hash(raw).slice(0,12).toUpperCase();
+}
   
 // ===== LICENSE CHECK =====  
 function checkLicense(){  
@@ -726,17 +739,31 @@ function checkLicense(){
 }  
 setInterval(checkLicense,1000);  
   
-// ===== ACTIVATE =====  
-function activate(){  
-  if(code.value.trim().toUpperCase() === genCode()){  
-    const exp = Date.now() + 365*24*60*60*1000;  
-    localStorage.setItem("PLAN_EXP", exp);  
-    license.style.display = "none";  
-    alert("Activation Successful");  
-  }else{  
-    alert("Invalid Code");  
-  }  
-}  
+function activate(){
+
+  const val = code.value.trim().toUpperCase();
+
+  let days = 0;
+
+  if(val === genCode(15)) days = 15;
+  else if(val === genCode(30)) days = 30;
+  else if(val === genCode(365)) days = 365;
+  else{
+    alert("Invalid Activation Code");
+    return;
+  }
+
+  const exp = Date.now() + days*24*60*60*1000;
+  localStorage.setItem("PLAN_EXP", exp);
+
+  license.style.display = "none";
+
+  alert(
+    days === 15 ? "15 दिन का प्लान एक्टिव हुआ" :
+    days === 30 ? "1 महीने का प्लान एक्टिव हुआ" :
+    "1 साल का प्लान एक्टिव हुआ"
+  );
+}
   
 // ===== CONTACT =====  
 function callNow(){  
