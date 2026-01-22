@@ -184,16 +184,16 @@ canvas{
 <script>
 let unlocked = false;
 
-function unlockSpeech(){
-  if(unlocked) return;
-  unlocked = true;
-
-  const u = new SpeechSynthesisUtterance("");
-  speechSynthesis.speak(u);
+function ensureSpeechUnlocked(){
+  if(window.speechSynthesis && !unlocked){
+    unlocked = true;
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0.01; // 🔥 safer
+    speechSynthesis.speak(u);
+  }
 }
 
-document.addEventListener("pointerdown", unlockSpeech, { once:true });
-document.addEventListener("touchstart", unlockSpeech, { once:true });
+
 </script>
 <script>
 /* ================= STORAGE CORE (FINAL) ================= */
@@ -468,14 +468,19 @@ let helpStart = 0;
 let helpLastSpoken = 0;  
 let helpReachedTen = false;  
   
-function speakHelp(text){  
-  speechSynthesis.cancel();  
-  const u = new SpeechSynthesisUtterance(text);  
-  u.lang = "hi-IN";  
-  u.rate = 0.9;  
-  u.pitch = 1.1;  
-  speechSynthesis.speak(u);  
-}  
+function speakHelp(text){
+  ensureSpeechUnlocked();
+  if(!window.speechSynthesis) return;
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "hi-IN";
+  u.rate = 0.9;
+  u.pitch = 1.1;
+
+  speechSynthesis.speak(u);
+}
   
 function stopHelpAll(){  
   clearInterval(helpTimer);  
@@ -841,34 +846,36 @@ function playFlipAndSpeak(){
 }  
   
 /* ================= VOICE ================= */  
-function speak(){  
-  if(!window.speechSynthesis || !unlocked) return;  
+function speak(){
+  ensureSpeechUnlocked();
+  if(!window.speechSynthesis) return;
 
-  speechSynthesis.cancel();  
+  speechSynthesis.cancel();
 
-  const it = DATA[mode][index];  
-  const name = child ? child + " " : "";  
-  const bol = name + it.voice + " बनाओ";  
+  const it = DATA[mode][index];
+  const name = child ? child + " " : "";
+  const bol = name + it.voice + " बनाओ";
 
-  const u = new SpeechSynthesisUtterance(bol);  
-  u.lang = "hi-IN";  
-  u.rate = 0.9;  
-  u.pitch = 1.1;  
+  const u = new SpeechSynthesisUtterance(bol);
+  u.lang = "hi-IN";
+  u.rate = 0.9;
+  u.pitch = 1.1;
 
-  speechSynthesis.speak(u);  
+  speechSynthesis.speak(u);
 }
   
-function speakText(text){  
-  if(!window.speechSynthesis || !unlocked) return;  
+function speakText(text){
+  ensureSpeechUnlocked();
+  if(!window.speechSynthesis) return;
 
-  speechSynthesis.cancel();  
+  speechSynthesis.cancel();
 
-  const u = new SpeechSynthesisUtterance(text);  
-  u.lang = "hi-IN";  
-  u.rate = 0.9;  
-  u.pitch = 1.1;  
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "hi-IN";
+  u.rate = 0.9;
+  u.pitch = 1.1;
 
-  speechSynthesis.speak(u);  
+  speechSynthesis.speak(u);
 }
   
 /* ========= FINAL DRAW + SAVE + PAGE SYSTEM (STABLE) ========= */  
