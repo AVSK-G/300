@@ -180,6 +180,21 @@ canvas{
     z-index:99999;
   "
 >
+
+<script>
+let unlocked = false;
+
+function unlockSpeech(){
+  if(unlocked) return;
+  unlocked = true;
+
+  const u = new SpeechSynthesisUtterance("");
+  speechSynthesis.speak(u);
+}
+
+document.addEventListener("pointerdown", unlockSpeech, { once:true });
+document.addEventListener("touchstart", unlockSpeech, { once:true });
+</script>
 <script>
 /* ================= STORAGE CORE (FINAL) ================= */
 
@@ -827,34 +842,34 @@ function playFlipAndSpeak(){
   
 /* ================= VOICE ================= */  
 function speak(){  
-  if(!window.speechSynthesis) return;  
-  
+  if(!window.speechSynthesis || !unlocked) return;  
+
   speechSynthesis.cancel();  
-  
+
   const it = DATA[mode][index];  
   const name = child ? child + " " : "";  
   const bol = name + it.voice + " बनाओ";  
-  
+
   const u = new SpeechSynthesisUtterance(bol);  
   u.lang = "hi-IN";  
   u.rate = 0.9;  
   u.pitch = 1.1;  
-  
+
   speechSynthesis.speak(u);  
-}  
+}
   
 function speakText(text){  
-  if(!window.speechSynthesis) return;  
-  
+  if(!window.speechSynthesis || !unlocked) return;  
+
   speechSynthesis.cancel();  
-  
+
   const u = new SpeechSynthesisUtterance(text);  
   u.lang = "hi-IN";  
   u.rate = 0.9;  
   u.pitch = 1.1;  
-  
+
   speechSynthesis.speak(u);  
-}  
+}
   
 /* ========= FINAL DRAW + SAVE + PAGE SYSTEM (STABLE) ========= */  
 /* ===== STORAGE SIZE (BYTES) ===== */  
