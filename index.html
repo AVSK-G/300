@@ -11,9 +11,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  
 <link rel="apple-touch-icon" href="assets/icon-192.png">  
 <style>  
+
+/* ================= COPY / SELECT DISABLE (KIDS SAFETY) ================= */
+*{
+  -webkit-user-select: none;      /* Android Chrome */
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  -webkit-touch-callout: none;    /* iOS long-press menu */
+}
+
 html,body{margin:0;height:100%;overflow:hidden;font-family:sans-serif}  
 body{display:flex;flex-direction:column;background:#fff}  
-  
+
 /* ===== TOP BAR ===== */  
 #top{  
   background:#4CAF50;color:#fff;  
@@ -30,14 +41,14 @@ body{display:flex;flex-direction:column;background:#fff}
   text-align:center;  
   font-size:13px;  
 }  
-  
+
 /* ===== MODES ===== */  
 #modes{display:flex;background:#388E3C}  
 #modes button{  
   flex:1;border:none;background:none;color:#fff;  
   padding:10px 0;font-size:14px  
 }  
-  
+
 /* ===== STAGE ===== */  
 #stage{flex:1;position:relative}  
 canvas{  
@@ -45,7 +56,7 @@ canvas{
   width:100%;height:100%;  
   touch-action:none;  
 }  
-  
+
 /* ===== LICENSE OVERLAY ===== */  
 #license{  
   position:fixed;  
@@ -113,12 +124,12 @@ canvas{
   border:3px solid #FFD600;  
   box-shadow:0 4px 10px rgba(0,0,0,.3);  
 }  
-  
+
 /* LEFT PAGE BUTTON */  
 .tool.prev{  
   left:0;  
 }  
-  
+
 /* RIGHT PAGE BUTTON */  
 .tool.next{  
   right:0;  
@@ -309,7 +320,7 @@ function storageDeleteByPrefix(prefix){
   { ch:"श", voice:"श" }, { ch:"ष", voice:"ष" }, { ch:"स", voice:"स" }, { ch:"ह", voice:"ह" },  
   { ch:"क्ष", voice:"क्ष" }, { ch:"त्र", voice:"त्र" }, { ch:"ज्ञ", voice:"ज्ञ" }  
 ],  
-  
+
   swar: [  
   { ch:"अ", voice:"अ" }, { ch:"आ", voice:"आ" }, { ch:"इ", voice:"इ" }, { ch:"ई", voice:"ई" },  
   { ch:"उ", voice:"उ" }, { ch:"ऊ", voice:"ऊ" }, { ch:"ऋ", voice:"ऋ" },  
@@ -317,7 +328,7 @@ function storageDeleteByPrefix(prefix){
   { ch:"ओ", voice:"ओ" }, { ch:"औ", voice:"औ" },  
   { ch:"अं", voice:"अं" }, { ch:"अः", voice:"अः" }  
 ],  
-  
+
   matra: [  
   { ch:"ा", voice:"आ" }, { ch:"ि", voice:"इ" }, { ch:"ी", voice:"ई" },  
   { ch:"ु", voice:"उ" }, { ch:"ू", voice:"ऊ" }, { ch:"ृ", voice:"ऋ" },  
@@ -325,39 +336,39 @@ function storageDeleteByPrefix(prefix){
   { ch:"ो", voice:"ओ" }, { ch:"ौ", voice:"औ" },  
   { ch:"ं", voice:"अं" }, { ch:"ः", voice:"अः" }  
 ],  
-  
+
   count: [  
   { ch:"1", voice:"वन" }, { ch:"2", voice:"टू" }, { ch:"3", voice:"थ्री" }, { ch:"4", voice:"फोर" }, { ch:"5", voice:"फाइव" },  
   { ch:"6", voice:"सिक्स" }, { ch:"7", voice:"सेवन" }, { ch:"8", voice:"एट" }, { ch:"9", voice:"नाइन" }, { ch:"10", voice:"टेन" },  
-  
+
   { ch:"11", voice:"इलेवन" }, { ch:"12", voice:"ट्वेल्व" }, { ch:"13", voice:"थर्टीन" }, { ch:"14", voice:"फॉर्टीन" }, { ch:"15", voice:"फिफ़्टीन" },  
   { ch:"16", voice:"सिक्स्टीन" }, { ch:"17", voice:"सेवेंटीन" }, { ch:"18", voice:"एटीन" }, { ch:"19", voice:"नाइन्टीन" }, { ch:"20", voice:"ट्वेंटी" },  
-  
+
   { ch:"21", voice:"ट्वेंटी वन" }, { ch:"22", voice:"ट्वेंटी टू" }, { ch:"23", voice:"ट्वेंटी थ्री" }, { ch:"24", voice:"ट्वेंटी फोर" }, { ch:"25", voice:"ट्वेंटी फाइव" },  
   { ch:"26", voice:"ट्वेंटी सिक्स" }, { ch:"27", voice:"ट्वेंटी सेवन" }, { ch:"28", voice:"ट्वेंटी एट" }, { ch:"29", voice:"ट्वेंटी नाइन" }, { ch:"30", voice:"थर्टी" },  
-  
+
   { ch:"31", voice:"थर्टी वन" }, { ch:"32", voice:"थर्टी टू" }, { ch:"33", voice:"थर्टी थ्री" }, { ch:"34", voice:"थर्टी फोर" }, { ch:"35", voice:"थर्टी फाइव" },  
   { ch:"36", voice:"थर्टी सिक्स" }, { ch:"37", voice:"थर्टी सेवन" }, { ch:"38", voice:"थर्टी एट" }, { ch:"39", voice:"थर्टी नाइन" }, { ch:"40", voice:"फॉर्टी" },  
-  
+
   { ch:"41", voice:"फॉर्टी वन" }, { ch:"42", voice:"फॉर्टी टू" }, { ch:"43", voice:"फॉर्टी थ्री" }, { ch:"44", voice:"फॉर्टी फोर" }, { ch:"45", voice:"फॉर्टी फाइव" },  
   { ch:"46", voice:"फॉर्टी सिक्स" }, { ch:"47", voice:"फॉर्टी सेवन" }, { ch:"48", voice:"फॉर्टी एट" }, { ch:"49", voice:"फॉर्टी नाइन" }, { ch:"50", voice:"फिफ़्टी" },  
-  
+
   { ch:"51", voice:"फिफ़्टी वन" }, { ch:"52", voice:"फिफ़्टी टू" }, { ch:"53", voice:"फिफ़्टी थ्री" }, { ch:"54", voice:"फिफ़्टी फोर" }, { ch:"55", voice:"फिफ़्टी फाइव" },  
   { ch:"56", voice:"फिफ़्टी सिक्स" }, { ch:"57", voice:"फिफ़्टी सेवन" }, { ch:"58", voice:"फिफ़्टी एट" }, { ch:"59", voice:"फिफ़्टी नाइन" }, { ch:"60", voice:"सिक्स्टी" },  
-  
+
   { ch:"61", voice:"सिक्स्टी वन" }, { ch:"62", voice:"सिक्स्टी टू" }, { ch:"63", voice:"सिक्स्टी थ्री" }, { ch:"64", voice:"सिक्स्टी फोर" }, { ch:"65", voice:"सिक्स्टी फाइव" },  
   { ch:"66", voice:"सिक्स्टी सिक्स" }, { ch:"67", voice:"सिक्स्टी सेवन" }, { ch:"68", voice:"सिक्स्टी एट" }, { ch:"69", voice:"सिक्स्टी नाइन" }, { ch:"70", voice:"सेवेंट्टी" },  
-  
+
   { ch:"71", voice:"सेवेंट्टी वन" }, { ch:"72", voice:"सेवेंट्टी टू" }, { ch:"73", voice:"सेवेंट्टी थ्री" }, { ch:"74", voice:"सेवेंट्टी फोर" }, { ch:"75", voice:"सेवेंट्टी फाइव" },  
   { ch:"76", voice:"सेवेंट्टी सिक्स" }, { ch:"77", voice:"सेवेंट्टी सेवन" }, { ch:"78", voice:"सेवेंट्टी एट" }, { ch:"79", voice:"सेवेंट्टी नाइन" }, { ch:"80", voice:"एटी" },  
-  
+
   { ch:"81", voice:"एटी वन" }, { ch:"82", voice:"एटी टू" }, { ch:"83", voice:"एटी थ्री" }, { ch:"84", voice:"एटी फोर" }, { ch:"85", voice:"एटी फाइव" },  
   { ch:"86", voice:"एटी सिक्स" }, { ch:"87", voice:"एटी सेवन" }, { ch:"88", voice:"एटी एट" }, { ch:"89", voice:"एटी नाइन" }, { ch:"90", voice:"नाइंटी" },  
-  
+
   { ch:"91", voice:"नाइंटी वन" }, { ch:"92", voice:"नाइंटी टू" }, { ch:"93", voice:"नाइंटी थ्री" }, { ch:"94", voice:"नाइंटी फोर" }, { ch:"95", voice:"नाइंटी फाइव" },  
   { ch:"96", voice:"नाइंटी सिक्स" }, { ch:"97", voice:"नाइंटी सेवन" }, { ch:"98", voice:"नाइंटी एट" }, { ch:"99", voice:"नाइंटी नाइन" }, { ch:"100", voice:"वन हंड्रेड" }  
 ],  
-  
+
   abc: [  
   { ch:"A", voice:"ए" },  
   { ch:"B", voice:"बी" },  
@@ -386,7 +397,7 @@ function storageDeleteByPrefix(prefix){
   { ch:"Y", voice:"वाई" },  
   { ch:"Z", voice:"ज़ेड" }  
 ],  
-  
+
   art: [  
   { ch:"⭐", voice:"स्टार" },  
   { ch:"🌈", voice:"इंद्रधनुष" },  
@@ -441,12 +452,12 @@ const stage = document.getElementById("stage");
 const bctx=base.getContext("2d");  
 const dctx=draw.getContext("2d");  
 const DPR=window.devicePixelRatio||1;  
-   
-  
+
+
 /* ================= BASIC STATE ================= */  
 let mode="vyanjan",index=0;  
 let appStarting = true;  
-  
+
 /* ================= NAME ================= */  
 let child=localStorage.getItem("CHILD")||"";  
 nameBtn.innerText=child||"Name";  
@@ -458,16 +469,16 @@ nameBtn.onclick=()=>{
     nameBtn.innerText=child;  
   }  
 };  
-  
+
 /* ================= HELP (FINAL LONG PRESS CALL – FIXED) ================= */  
-  
+
 const helpBtn = document.getElementById("helpBtn");  
-  
+
 let helpTimer = null;  
 let helpStart = 0;  
 let helpLastSpoken = 0;  
 let helpReachedTen = false;  
-  
+
 function speakHelp(text){
   ensureSpeechUnlocked();
   if(!window.speechSynthesis) return;
@@ -481,87 +492,87 @@ function speakHelp(text){
 
   speechSynthesis.speak(u);
 }
-  
+
 function stopHelpAll(){  
   clearInterval(helpTimer);  
   helpTimer = null;  
   speechSynthesis.cancel();  
 }  
-  
+
 helpBtn.addEventListener("pointerdown", e=>{  
   e.preventDefault();  
-  
+
   stopHelpAll();  
-  
+
   helpStart = Date.now();  
   helpLastSpoken = 0;  
   helpReachedTen = false;  
-  
+
   // पहली आवाज  
   speakHelp("सहायता हेतु हेल्प बटन को मिनिमम दस सेकंड तक दबाकर रखें");  
-  
+
   helpTimer = setInterval(()=>{  
     const elapsed = Math.floor((Date.now() - helpStart) / 1000);  
-  
+
     // 6–9 सेकंड की गिनती  
     if(elapsed >= 6 && elapsed <= 9 && elapsed !== helpLastSpoken){  
       helpLastSpoken = elapsed;  
       speakHelp(elapsed.toString());  
     }  
-  
+
     // ठीक 10 सेकंड  
     if(elapsed === 10 && !helpReachedTen){  
       helpReachedTen = true;  
       helpLastSpoken = 10;  
       speakHelp("दस। अब बटन छोड़ दें");  
     }  
-  
+
   }, 200);  
 });  
-  
+
 helpBtn.addEventListener("pointerup", ()=>{  
   const total = Math.floor((Date.now() - helpStart) / 1000);  
   stopHelpAll();  
-  
+
   if(total >= 10){  
     window.location.href = "tel:6393998216";  
   }  
 });  
-  
+
 helpBtn.addEventListener("pointerleave", stopHelpAll);  
 helpBtn.addEventListener("pointercancel", stopHelpAll);  
-  
+
 /* ================= CANVAS RESIZE (FINAL SAFE) ================= */  
 function resize(){
-  
+
   const r = stage.getBoundingClientRect();  
-  
+
   [base, draw].forEach(c=>{  
     c.width  = Math.floor(r.width * DPR);  
     c.height = Math.floor(r.height * DPR);  
     c.style.width  = r.width + "px";  
     c.style.height = r.height + "px";  
   });  
-  
+
   bctx.setTransform(DPR,0,0,DPR,0,0);  
   dctx.setTransform(DPR,0,0,DPR,0,0);  
-  
+
   drawBase();  
   loadPage();  
 }  
-  
+
 window.addEventListener("resize", resize);  
 window.addEventListener("orientationchange", resize);  
-  
+
 // ===== FIXED drawBase (replace सभी पुराने drawBase को यही से) =====  
 function drawBase(){  
   const it = DATA[mode][index];  
   bctx.clearRect(0,0,base.width,base.height);  
-  
+
   bctx.textAlign = "center";  
   bctx.textBaseline = "middle";  
   bctx.font = "240px Arial";  
-  
+
   if(mode === "art"){  
     bctx.globalAlpha = 0.25;  
     bctx.fillStyle = "#000";  
@@ -569,16 +580,16 @@ function drawBase(){
     bctx.globalAlpha = 1;  
     bctx.fillStyle = "#ddd";  
   }  
-  
+
   bctx.fillText(  
     it.ch,  
     base.width / DPR / 2,  
     base.height / DPR / 2  
   );  
-  
+
   bctx.globalAlpha = 1; // reset  
 }  
-  
+
 /* ================= TOOLS ================= */  
 const sizes=[6,10,16,22];  
 let sizeIndex=1;  
@@ -587,7 +598,7 @@ let currentTool = "pen"; // pen | color | pattern | eraser
 // ===== ERASER SIZES (INDEPENDENT) =====  
 const eraserSizes = [12, 20, 30, 45];  
 let eraserSizeIndex = 1;  
-  
+
 const colors=["#e53935","#43a047","#fdd835","#fb8c00","#8e24aa","#6d4c41","#000000","#ffffff","#757575","#26c6da","#d81b60","#7cb342","#c0ca33","#ff7043","#5e35b1","#00897b","#f06292","#90a4ae","#a1887f","#FFD700","#C9B037","#E6BE8A","#C0C0C0","#BFC1C2","#8E8E93","#CD7F32","#B87333","#1e88e5"];  
 let colorIndex=0;  
 const sizeNames = [  
@@ -596,14 +607,14 @@ const sizeNames = [
   "बड़ी पेंसिल",  
   "बहुत बड़ी पेंसिल"  
 ];  
-  
+
 const eraserNames = [  
   "छोटा रबर",  
   "मध्यम रबर",  
   "बड़ा रबर",  
   "बहुत बड़ा रबर"  
 ];  
-  
+
 const colorNames = [  
   "लाल रंग",  
   "हरा रंग",  
@@ -634,7 +645,7 @@ const colorNames = [
   "ब्रॉन्ज रंग",  
   "कॉपर रंग"  
 ];  
-  
+
 const patternNames = [  
   "स्टार डिज़ाइन",  
   "फूल डिज़ाइन",  
@@ -652,7 +663,7 @@ const patternNames = [
 /* ================= KIDS SHAPES PATTERN BRUSH ================= */  
 let patternIndex = 0;  
 const patterns = ["⭐","🌼","❤️","🌹","🎈","🔥","🍎","🇮🇳","🚩","🖐️","💵","🐟"]; // Kids-friendly  
-  
+
 function cyclePattern(){  
   if(currentTool !== "pattern"){  
     currentTool = "pattern";  
@@ -660,31 +671,31 @@ function cyclePattern(){
     speakText(patternNames[patternIndex]);  
     return;  
   }  
-  
+
   patternIndex = (patternIndex + 1) % patterns.length;  
   speakText(patternNames[patternIndex]);  
 }  
-  
+
 function makePattern(){  
   const unit = sizes[sizeIndex] * 1.8;  
   const pc = document.createElement("canvas");  
   pc.width = unit;  
   pc.height = unit;  
-  
+
   const cx = pc.getContext("2d");  
   cx.fillStyle = colors[colorIndex];  
   cx.font = unit + "px sans-serif";  
   cx.textAlign = "center";  
   cx.textBaseline = "middle";  
-  
+
   cx.clearRect(0,0,unit,unit);  
   cx.fillText(patterns[patternIndex], unit/2, unit/2);  
-  
+
   return dctx.createPattern(pc,"repeat");  
 }  
-  
+
 /* ================= LICENSE SYSTEM ================= */  
-  
+
 // ===== Activation ID =====  
 let actIdVal = localStorage.getItem("ACT_ID");  
 if(!actIdVal){  
@@ -692,17 +703,17 @@ if(!actIdVal){
   localStorage.setItem("ACT_ID", actIdVal);  
 }  
 actId.innerText = actIdVal;  
-  
+
 // ===== Trial =====  
 const TRIAL_MS = 5*60*1000;  
 let trialStart = +localStorage.getItem("TRIAL_START") || Date.now();  
 localStorage.setItem("TRIAL_START", trialStart);  
-  
+
 // ===== HIDDEN SECRET =====  
 function _k1(){ return [72,73,78,68,73]; }   // H I N D I  
 function _k2(){ return [64,50,48,50,53]; }   // @2025  
 function _k3(){ return [33,91,42]; }         // noise  
-  
+
 function buildSecret(){  
   return _k1()  
     .concat(_k3())  
@@ -710,7 +721,7 @@ function buildSecret(){
     .map(c=>String.fromCharCode(c))  
     .join("");  
 }  
-  
+
 // ===== STRONG HASH =====  
 function hash(str){
 
@@ -731,7 +742,7 @@ function hash(str){
 
   return out.slice(0,12).toUpperCase();
 }
-  
+
 // ===== FINAL SECURE CODE (PLAN HIDDEN) =====
 function genCode(planDays){
 
@@ -743,7 +754,7 @@ function genCode(planDays){
 
   return hash(raw).slice(0,12).toUpperCase();
 }
-  
+
 // ===== LICENSE CHECK =====  
 function checkLicense(){  
   const exp = +localStorage.getItem("PLAN_EXP") || 0;  
@@ -758,7 +769,7 @@ function checkLicense(){
   }  
 }  
 setInterval(checkLicense,1000);  
-  
+
 function activate(){
 
   const val = code.value.trim().toUpperCase();
@@ -784,7 +795,7 @@ function activate(){
     "1 साल का प्लान एक्टिव हुआ"
   );
 }
-  
+
 // ===== CONTACT =====  
 function callNow(){  
   location.href = "tel:+916393998216";  
@@ -795,7 +806,7 @@ function waNow(){
     encodeURIComponent("Activation ID: " + actIdVal);  
 }  
 /* ================= PAGE + MODE SYSTEM ================= */  
-  
+
 function setMode(m){  
   if(drawing) savePage();  
   mode = m;  
@@ -803,48 +814,48 @@ function setMode(m){
   loadPage();  
   speak();  
 }  
-  
+
 /* ===== PAGE FLIP LOCK ===== */  
 let flipping = false;  
-  
+
 function nextPage(){  
   if(flipping) return;  
   flipping = true;  
-  
+
   // 👉 next index  
   index = (index + 1) % DATA[mode].length;  
-  
+
   // 🧠 LAST PAGE SAVE (यही main line है)  
   localStorage.setItem("LAST_MODE", mode);  
   localStorage.setItem("LAST_INDEX", index);  
-  
+
   loadPage();  
   playFlipAndSpeak();  
-  
+
   setTimeout(()=>flipping=false,150);  
 }  
-  
+
 function prevPage(){  
   if(flipping) return;  
   flipping = true;  
-  
+
   // 👉 previous index  
   index = (index - 1 + DATA[mode].length) % DATA[mode].length;  
-  
+
   // 🧠 LAST PAGE SAVE (यही main line है)  
   localStorage.setItem("LAST_MODE", mode);  
   localStorage.setItem("LAST_INDEX", index);  
-  
+
   loadPage();  
   playFlipAndSpeak();  
-  
+
   setTimeout(()=>flipping=false,150);  
 }  
-  
+
 function playFlipAndSpeak(){  
   speak();  
 }  
-  
+
 /* ================= VOICE ================= */  
 function speak(){
   ensureSpeechUnlocked();
@@ -863,7 +874,7 @@ function speak(){
 
   speechSynthesis.speak(u);
 }
-  
+
 function speakText(text){
   ensureSpeechUnlocked();
   if(!window.speechSynthesis) return;
@@ -877,7 +888,7 @@ function speakText(text){
 
   speechSynthesis.speak(u);
 }
-  
+
 /* ========= FINAL DRAW + SAVE + PAGE SYSTEM (STABLE) ========= */  
 /* ===== STORAGE SIZE (BYTES) ===== */  
 function storageSize(){  
@@ -888,10 +899,10 @@ function storageSize(){
   }  
   return total;  
 }  
-  
+
 /* ===== GLOBAL STORAGE LIMIT (SAFE) ===== */  
 const MAX_STORAGE = 4.5 * 1024 * 1024; // 4.5 MB  
-  
+
 /* =====================================================
    FINAL STORAGE CLEANUP (TIME INSIDE INDEXEDDB RECORD)
    ===================================================== */
@@ -968,7 +979,7 @@ function storageGetAll(cb){
 
   req.onerror = ()=>cb([]);
 }
-  
+
 /* ===== SAVE / LOAD (ABSOLUTE SAFE) ===== */  
 function savePage(){
 
@@ -990,7 +1001,7 @@ function savePage(){
     console.warn("Save skipped");
   }
 }
-  
+
 function loadPage(){
 
   // ✅ CURRENT PAGE REMEMBER (FINAL FIX)
@@ -1028,7 +1039,7 @@ function loadPage(){
     img.src = data.image;
   });
 }
-  
+
 /* ===== AUTO SAVE (SAFE – NEVER SAVE BLANK) ===== */  
 // 🔐 TRUE तभी होगा जब सच में कुछ draw हुआ हो
 let hasDrawn = false;
@@ -1039,7 +1050,7 @@ let activePointer=null;
 let zone=null;  
 let isEraser=false;  
 let previousTool = "pen";  
-  
+
 /* ===== POINTER POSITION FIX (NO SHIFT) ===== */  
 function getPos(e){  
   const r = draw.getBoundingClientRect();  
@@ -1048,26 +1059,26 @@ function getPos(e){
     y: e.clientY - r.top  
   };  
 }  
-  
-  
+
+
 draw.addEventListener("pointerdown", e => {  
   e.preventDefault();  
   draw.setPointerCapture(e.pointerId);  
-  
+
   if(activePointer !== null) return;  
   activePointer = e.pointerId;  
-  
+
   const r = draw.getBoundingClientRect();  
   const x = e.clientX - r.left;  
-  
-    
+
+
   zone = "draw";  
   drawing = true;  
-  
+
   const p = getPos(e);  
   lastX = p.x;  
   lastY = p.y;  
-  
+
   dctx.lineCap = "round";  
   dctx.lineJoin = "round";  
   if(isEraser){  
@@ -1086,7 +1097,7 @@ draw.addEventListener("pointerdown", e => {
 
   }else{  
     dctx.globalCompositeOperation = "source-over";  
-  
+
    if(currentTool === "pattern"){  
      dctx.strokeStyle = makePattern();  
   }else{  
@@ -1094,7 +1105,7 @@ draw.addEventListener("pointerdown", e => {
   }  
   }  
 });  
-  
+
   draw.addEventListener("pointermove", e => {
   if(!drawing || e.pointerId !== activePointer || zone !== "draw") return;
   e.preventDefault();
@@ -1111,7 +1122,7 @@ draw.addEventListener("pointerdown", e => {
   lastX = p.x;
   lastY = p.y;
 });
-  
+
 draw.addEventListener("pointerup", e => {  
   if(e.pointerId !== activePointer) return;  
   drawing = false;  
@@ -1121,7 +1132,7 @@ draw.addEventListener("pointerup", e => {
   zone = null;  
   // रबड़ का उपयोग करने के बाद, पिछली स्थिति में आ जाएं  
   if(isEraser){  
-   
+
    dctx.globalCompositeOperation = "source-over";
 
     isEraser = false;  
@@ -1129,13 +1140,13 @@ draw.addEventListener("pointerup", e => {
     speakText("रबड़ बंद हो गया"); // रबड़ बंद होने की आवाज  
   }  
 });  
-  
+
 draw.addEventListener("pointercancel", () => {  
   drawing = false;  
   activePointer = null;  
   zone = null;  
 });  
-  
+
 /* ===== TOOLS ===== */  
 function eraser(){  
   if(isEraser){  
@@ -1146,35 +1157,35 @@ function eraser(){
   isEraser = true;  
   speakText(eraserNames[eraserSizeIndex]);  
 }  
-  
+
 function cycleColor(){  
   if(currentTool !== "color"){  
     currentTool = "color";  
     isEraser = false;  
-  
+
     speakText(colorNames[colorIndex]);  
     return;  
   }  
-  
+
   colorIndex = (colorIndex + 1) % colors.length;  
   speakText(colorNames[colorIndex]);  
 }  
-  
+
 function cycleSize(){  
   // अगर पहली बार पेंसिल select हो रही है  
   if(currentTool !== "pen"){  
     currentTool = "pen";  
     isEraser = false;  
-  
+
     speakText(sizeNames[sizeIndex]);  
     return;  
   }  
-  
+
   // अगर पेंसिल पहले से selected है → size बदले  
   sizeIndex = (sizeIndex + 1) % sizes.length;  
   speakText(sizeNames[sizeIndex]);  
 }  
-  
+
 /* ========= CLEAR BUTTON : SINGLE + DOUBLE TAP (FINAL FIX) ========= */
 
 const clearBtn = document.getElementById("clearBtn");
@@ -1198,7 +1209,7 @@ clearBtn.addEventListener("pointerdown", e=>{
       dctx.clearRect(0,0,draw.width,draw.height);
 
       storageDelete(`DRAW_${mode}_${index}`);
-      
+
 
       hasDrawn = false;
       loadPage();
@@ -1269,7 +1280,7 @@ const tools = document.querySelectorAll(".tool");
 let dragEl = null;  
 let startX = 0, startY = 0;  
 let dragging = false;  
-  
+
 // --- RESTORE POSITIONS ---  
 tools.forEach(btn=>{  
   const saved = localStorage.getItem("tool-pos-" + btn.dataset.tool);  
@@ -1279,9 +1290,9 @@ tools.forEach(btn=>{
     btn.style.top  = pos.top;  
   }  
 });  
-  
+
 tools.forEach(btn => {  
-  
+
   btn.addEventListener("pointerdown", e => {  
     startX = e.clientX;  
     startY = e.clientY;  
@@ -1289,18 +1300,18 @@ tools.forEach(btn => {
     dragEl = btn;  
     dragEl.setPointerCapture(e.pointerId);  
   });  
-  
+
   btn.addEventListener("pointermove", e => {  
   if (!dragEl) return;  
-  
+
   const r = stage.getBoundingClientRect();  
-  
+
   let x = e.clientX - r.left - dragEl.offsetWidth / 2;  
   let y = e.clientY - r.top  - dragEl.offsetHeight / 2;  
-  
+
   // 🔒 Y boundary (सब tools के लिए)  
   y = Math.max(0, Math.min(y, r.height - dragEl.offsetHeight));  
-  
+
   // 🔒 PAGE BUTTONS (X fixed)  
   if (dragEl.dataset.tool === "prev") {  
     x = 0;  
@@ -1312,28 +1323,28 @@ tools.forEach(btn => {
     // 🔒 बाकी tools के लिए full boundary  
     x = Math.max(0, Math.min(x, r.width - dragEl.offsetWidth));  
   }  
-  
+
   if (!dragging && Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {  
     dragging = true;  
   }  
   if (!dragging) return;  
-  
+
   dragEl.style.left = x + "px";  
   dragEl.style.top  = y + "px";  
 });  
-  
+
   btn.addEventListener("pointerup", e => {  
-  
+
   if (!dragEl) return;  
-  
+
   const r = stage.getBoundingClientRect();  
-  
+
   let x = dragEl.offsetLeft;  
   let y = dragEl.offsetTop;  
-  
+
   const w = dragEl.offsetWidth;  
   const h = dragEl.offsetHeight;  
-  
+
   // 🔒 PAGE BUTTONS – fixed edges  
   if (dragEl.dataset.tool === "prev") {  
     dragEl.style.left = "0px";  
@@ -1343,16 +1354,16 @@ tools.forEach(btn => {
   }   
   else {  
     // 🧲 SNAP TO NEAREST EDGE (4 sides)  
-  
+
     const distLeft   = x;  
     const distRight  = r.width - (x + w);  
     const distTop    = y;  
     const distBottom = r.height - (y + h);  
-  
+
     const min = Math.min(  
       distLeft, distRight, distTop, distBottom  
     );  
-  
+
     if (min === distLeft) {  
       x = 0;  
     } else if (min === distRight) {  
@@ -1362,11 +1373,11 @@ tools.forEach(btn => {
     } else if (min === distBottom) {  
       y = r.height - h;  
     }  
-  
+
     dragEl.style.left = x + "px";  
     dragEl.style.top  = y + "px";  
   }  
-  
+
   // 💾 position save  
   localStorage.setItem(  
     "tool-pos-" + dragEl.dataset.tool,  
@@ -1375,47 +1386,47 @@ tools.forEach(btn => {
       top:  dragEl.style.top  
     })  
   );  
-  
+
   dragEl = null;  
   dragging = false;  
 });  
-  
+
 });  
-  
+
 /* ================= INIT ================= */  
 // 🧠 App reopen पर last page restore  
 (function(){  
   const m = localStorage.getItem("LAST_MODE");  
   const i = localStorage.getItem("LAST_INDEX");  
-  
+
   if(m && DATA[m]){  
     mode = m;  
     index = i ? parseInt(i,10) : 0;  
   }  
 })();  
-  
+
 resize();  
 appStarting = false;   // 🔓 अब save allow है  
 checkLicense();  
 </script>  <script>  
 if ("serviceWorker" in navigator) {  
   let newWorker;  
-  
+
   navigator.serviceWorker.register("sw.js");  
-  
+
   let refreshing = false;  
-  
+
 navigator.serviceWorker.addEventListener("controllerchange", () => {  
   if (refreshing) return;  
   refreshing = true;  
   window.location.reload();  
 });  
-  
+
   navigator.serviceWorker.getRegistration().then(reg => {  
     if (!reg) return;  
-  
+
     if (reg.waiting) showUpdate(reg.waiting);  
-  
+
     reg.addEventListener("updatefound", () => {  
       newWorker = reg.installing;  
       newWorker.addEventListener("statechange", () => {  
@@ -1425,15 +1436,15 @@ navigator.serviceWorker.addEventListener("controllerchange", () => {
       });  
     });  
   });  
-  
+
   function showUpdate(worker) {  
-  
+
   // 🔒 अगर पहले से update bar है तो नया मत बनाओ  
   if (document.getElementById("update-bar")) return;  
-  
+
   const bar = document.createElement("div");  
   bar.id = "update-bar";  
-  
+
   bar.style.cssText = `  
     position:fixed;  
     bottom:10px;  
@@ -1449,21 +1460,26 @@ navigator.serviceWorker.addEventListener("controllerchange", () => {
     align-items:center;  
     z-index:9999;  
   `;  
-  
+
   bar.innerHTML = `  
     🔄 नया अपडेट आया है  
     <button style="padding:6px 12px;border:none;border-radius:6px">  
       Refresh  
     </button>  
   `;  
-  
+
   bar.querySelector("button").onclick = () => {  
     worker.postMessage("SKIP_WAITING");  
   };  
-  
+
   document.body.appendChild(bar);  
 }  
 }  
 </script>  
+<script>
+document.addEventListener("contextmenu", function(e){
+  e.preventDefault();
+});
+</script>
 </body>  
 </html>
